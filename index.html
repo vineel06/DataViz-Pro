@@ -1,0 +1,2245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>DataViz Pro | AI-Powered Excel Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at 20% 30%, rgba(249, 115, 22, 0.08), transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, rgba(6, 182, 212, 0.05), transparent 50%);
+        }
+
+        /* App Container */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(249, 115, 22, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .logo-area {
+            padding: 28px 24px;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); }
+        }
+
+        .logo-icon i {
+            font-size: 22px;
+            color: white;
+        }
+
+        .logo-area span {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 24px 16px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            color: #8a8a9a;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.2), rgba(6, 182, 212, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-item:hover {
+            background: rgba(249, 115, 22, 0.1);
+            color: #f97316;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(6, 182, 212, 0.1));
+            color: #f97316;
+            border-left: 3px solid #f97316;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .storage-info {
+            padding: 10px;
+            background: rgba(249, 115, 22, 0.1);
+            border-radius: 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f97316;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Theme Toggle - Hidden from header, only in settings */
+        .header-right .theme-toggle {
+            display: none;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            padding: 24px 32px;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::after {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #06b6d4;
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: #8a8a9a;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-change {
+            font-size: 12px;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-card i {
+            font-size: 36px;
+            color: #f97316;
+            opacity: 0.7;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(249, 115, 22, 0.5);
+            border-radius: 16px;
+            padding: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        .upload-zone:hover {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon i {
+            font-size: 48px;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .upload-zone h3 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .upload-zone p {
+            color: #8a8a9a;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(249, 115, 22, 0.2);
+            border: 1px solid rgba(249, 115, 22, 0.5);
+            padding: 10px 24px;
+            border-radius: 10px;
+            color: #f97316;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(6, 182, 212, 0.3);
+            border-color: #06b6d4;
+            color: #06b6d4;
+            transform: translateY(-2px);
+        }
+
+        .upload-options {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* File List */
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .file-item {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 12px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover {
+            border-color: #06b6d4;
+            transform: translateY(-2px);
+        }
+
+        .file-item i {
+            color: #f97316;
+        }
+
+        .file-name {
+            font-size: 13px;
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* Charts Section */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .charts-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .chart-type-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chart-type-btn {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: #f97316;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .chart-type-btn.active {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+
+        .chart-type-btn:hover {
+            border-color: #06b6d4;
+            color: #06b6d4;
+            transform: translateY(-2px);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+            gap: 24px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0), rgba(6, 182, 212, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .chart-card:hover::before {
+            opacity: 1;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-8px);
+            border-color: #06b6d4;
+            box-shadow: 0 15px 40px rgba(6, 182, 212, 0.3);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-weight: 700;
+            font-size: 16px;
+            background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .chart-stats {
+            font-size: 11px;
+            color: #f97316;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(249, 115, 22, 0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+
+        /* Analytics Page */
+        .analytics-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+
+        .data-table-panel, .stats-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .search-input, .filter-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: white;
+            flex: 1;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #06b6d4;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        #dataTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #dataTable th, #dataTable td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        #dataTable th {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .table-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .pagination-btn {
+            background: rgba(249, 115, 22, 0.2);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #f97316;
+            cursor: pointer;
+        }
+
+        .stat-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            background: rgba(6, 182, 212, 0.1);
+            transform: translateX(5px);
+        }
+
+        .stat-name {
+            font-weight: 600;
+            color: #06b6d4;
+            margin-bottom: 4px;
+        }
+
+        /* Share Page */
+        .share-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .share-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .share-url-section {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        #shareUrl {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Settings Page */
+        .settings-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .settings-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .danger-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+            color: #ef4444;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        /* AI Assistant - Ultra Intelligent */
+        .ai-assistant {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 420px;
+            background: rgba(10, 10, 15, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(249, 115, 22, 0.5);
+            border-radius: 20px;
+            z-index: 200;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .ai-assistant.minimized .ai-body {
+            display: none;
+        }
+
+        .ai-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(6, 182, 212, 0.1));
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-header i {
+            font-size: 20px;
+            color: #f97316;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .ai-header span {
+            flex: 1;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .ai-body {
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+        }
+
+        .ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .ai-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            animation: slideInLeft 0.3s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .ai-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .ai-message.user p {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+        }
+
+        .ai-message p {
+            background: rgba(6, 182, 212, 0.15);
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 13px;
+            line-height: 1.5;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .ai-input-area {
+            padding: 16px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        #aiInput {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        #aiInput:focus {
+            outline: none;
+            border-color: #06b6d4;
+        }
+
+        #sendAiBtn {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #sendAiBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Notification */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .analytics-container {
+                grid-template-columns: 1fr;
+            }
+            .page {
+                padding: 16px;
+            }
+            .ai-assistant {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #f97316, #06b6d4);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span>DataViz <span>Pro</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </li>
+                <li class="nav-item" data-page="files">
+                    <i class="fas fa-folder-open"></i>
+                    <span>My Files</span>
+                </li>
+                <li class="nav-item" data-page="share">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Share</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="storage-info">
+                    <i class="fas fa-database"></i>
+                    <span id="storageUsed">0 MB</span>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <!-- Theme toggle removed from header - only in settings -->
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Total Profit</div>
+                            <div class="stat-value" id="totalProfit">$0</div>
+                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
+                        </div>
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Customers</div>
+                            <div class="stat-value" id="totalCustomers">0</div>
+                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
+                        </div>
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Growth Rate</div>
+                            <div class="stat-value" id="growthRate">0%</div>
+                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
+                        </div>
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Avg. Order Value</div>
+                            <div class="stat-value" id="avgOrderValue">$0</div>
+                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
+                        </div>
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+
+                <div class="upload-section">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Upload Excel/CSV files</h3>
+                        <p>Drag & drop or click to browse</p>
+                        <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" hidden>
+                        <button class="btn-primary" id="browseBtn">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                    <div class="upload-options">
+                        <button class="btn-secondary" id="sampleDataBtn">
+                            <i class="fas fa-chart-simple"></i> Load Sample
+                        </button>
+                        <button class="btn-secondary" id="clearAllBtn">
+                            <i class="fas fa-trash-alt"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="file-list" id="fileList"></div>
+
+                <div class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales Overview</span>
+                </div>
+
+                <div class="charts-controls">
+                    <div class="chart-type-selector">
+                        <button class="chart-type-btn active" data-chart-type="bar">📊 Bar Chart</button>
+                        <button class="chart-type-btn" data-chart-type="line">📈 Line Chart</button>
+                        <button class="chart-type-btn" data-chart-type="pie">🥧 Pie Chart</button>
+                        <button class="chart-type-btn" data-chart-type="doughnut">🍩 Doughnut</button>
+                        <button class="chart-type-btn" data-chart-type="radar">🎯 Radar</button>
+                        <button class="chart-type-btn" data-chart-type="polarArea">🌸 Polar Area</button>
+                        <button class="chart-type-btn" data-chart-type="area">📊 Area Chart</button>
+                        <button class="chart-type-btn" data-chart-type="horizontalBar">↔️ Horizontal Bar</button>
+                    </div>
+                    <div>
+                        <button id="refreshChartsBtn" class="btn-secondary">🔄 Refresh</button>
+                        <button id="exportAllChartsZipBtn" class="btn-primary">📦 Export All as ZIP</button>
+                    </div>
+                </div>
+
+                <div class="charts-grid" id="chartsGrid">
+                    <div class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Upload an Excel file to see beautiful charts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analyticsPage" class="page">
+                <div class="analytics-container">
+                    <div class="data-table-panel">
+                        <h3 style="color:#f97316; margin-bottom:16px"><i class="fas fa-table"></i> Data Preview</h3>
+                        <div class="table-controls">
+                            <input type="text" id="tableSearch" placeholder="Search data..." class="search-input">
+                            <select id="columnFilter" class="filter-select">
+                                <option value="">All Columns</option>
+                            </select>
+                            <button id="applyFilterBtn" class="btn-secondary">Apply</button>
+                            <button id="resetFilterBtn" class="btn-secondary">Reset</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table id="dataTable">
+                                <thead id="tableHead"></thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="table-pagination">
+                            <button id="prevPageBtn" class="pagination-btn">Previous</button>
+                            <span id="pageInfo">Page 1 of 1</span>
+                            <button id="nextPageBtn" class="pagination-btn">Next</button>
+                        </div>
+                    </div>
+                    <div class="stats-panel">
+                        <h3 style="color:#f97316; margin-bottom:16px"><i class="fas fa-chart-simple"></i> Column Statistics</h3>
+                        <div id="statisticsContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Page -->
+            <div id="filesPage" class="page">
+                <div style="max-width:800px; margin:0 auto">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:20px">
+                        <h3 style="color:#f97316"><i class="fas fa-database"></i> Saved Workbooks</h3>
+                        <button id="exportAllDataBtn" class="btn-primary">Export All</button>
+                    </div>
+                    <div id="savedFilesList"></div>
+                </div>
+            </div>
+
+            <!-- Share Page -->
+            <div id="sharePage" class="page">
+                <div class="share-container">
+                    <div class="share-card">
+                        <h3 style="color:#f97316"><i class="fas fa-link"></i> Share Dashboard</h3>
+                        <div class="share-url-section">
+                            <input type="text" id="shareUrl" readonly placeholder="Click generate to create share link">
+                            <button id="generateShareUrlBtn" class="btn-primary">Generate URL</button>
+                            <button id="copyUrlBtn" class="btn-secondary">Copy</button>
+                            <button id="generateQrBtn" class="btn-secondary">QR Code</button>
+                        </div>
+                        <div id="qrCodeContainer" style="display: none; justify-content: center; margin: 20px 0"></div>
+                        <div class="export-buttons">
+                            <button id="exportPdfBtn" class="btn-secondary">📄 Export PDF</button>
+                            <button id="exportCsvBtn" class="btn-secondary">📊 Export CSV</button>
+                            <button id="exportJsonBtn" class="btn-secondary">💾 Export JSON</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settingsPage" class="page">
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3 style="color:#f97316"><i class="fas fa-palette"></i> Appearance</h3>
+                        <div class="setting-item">
+                            <label>Dark Mode</label>
+                            <label class="switch" style="position:relative; display:inline-block; width:52px; height:26px">
+                                <input type="checkbox" id="settingsDarkMode" style="opacity:0; width:0; height:0">
+                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#2a2a35; transition:0.3s; border-radius:34px"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>Chart Animation Speed</label>
+                            <input type="range" id="animationSpeed" min="0" max="1000" step="50" value="500">
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3 style="color:#f97316"><i class="fas fa-database"></i> Data Settings</h3>
+                        <div class="setting-item">
+                            <label>Auto-save to localStorage</label>
+                            <label class="switch" style="position:relative; display:inline-block; width:52px; height:26px">
+                                <input type="checkbox" id="autoSave" checked style="opacity:0; width:0; height:0">
+                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#2a2a35; transition:0.3s; border-radius:34px"></span>
+                            </label>
+                        </div>
+                        <button id="clearStorageBtn" class="danger-btn">Clear All Saved Data</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Assistant - Ultra Intelligent -->
+    <div id="aiAssistant" class="ai-assistant minimized">
+        <div class="ai-header">
+            <i class="fas fa-brain"></i>
+            <span>DataViz AI Assistant</span>
+            <i class="fas fa-chevron-up ai-toggle-icon"></i>
+        </div>
+        <div class="ai-body">
+            <div class="ai-messages" id="aiMessages">
+                <div class="ai-message bot">
+                    <i class="fas fa-brain"></i>
+                    <p>🧠 **Ultra-Intelligent AI Assistant Ready!**<br><br>I can help you with:<br><br>📊 **Data Analysis**<br>• "Show me statistics"<br>• "What's the average of [column]?"<br>• "Find trends in my data"<br><br>📈 **Chart Recommendations**<br>• "What chart should I use?"<br>• "Compare sales and profit"<br><br>🔍 **Data Insights**<br>• "Summarize my data"<br>• "Find outliers"<br>• "Show me the highest values"<br><br>💡 **Tips & Help**<br>• "How to use this tool?"<br>• "Explain features"</p>
+                </div>
+            </div>
+            <div class="ai-input-area">
+                <input type="text" id="aiInput" placeholder="Ask me anything about your data...">
+                <button id="sendAiBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        // Ultra Intelligent DataViz Pro Application
+        class DataVizPro {
+            constructor() {
+                this.currentData = null;
+                this.currentFileName = null;
+                this.charts = [];
+                this.currentChartType = 'bar';
+                this.currentPageNum = 1;
+                this.rowsPerPage = 15;
+                this.filteredData = null;
+                this.searchText = '';
+                this.selectedColumn = '';
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadStoredData();
+                this.initTheme();
+                this.updateStorageInfo();
+                this.startMemoryMonitor();
+                this.showNotification('🧠 Ultra-Intelligent AI Assistant Ready! Ask me anything about your data.', 'success');
+            }
+
+            bindEvents() {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', () => this.switchPage(item.dataset.page));
+                });
+
+                const uploadZone = document.getElementById('uploadZone');
+                const fileInput = document.getElementById('fileInput');
+                const browseBtn = document.getElementById('browseBtn');
+
+                uploadZone.addEventListener('click', () => fileInput.click());
+                uploadZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadZone.style.borderColor = '#06b6d4';
+                    uploadZone.style.background = 'rgba(6, 182, 212, 0.1)';
+                });
+                uploadZone.addEventListener('dragleave', () => {
+                    uploadZone.style.borderColor = 'rgba(249, 115, 22, 0.5)';
+                    uploadZone.style.background = 'rgba(249, 115, 22, 0.05)';
+                });
+                uploadZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.handleFiles(Array.from(e.dataTransfer.files));
+                });
+
+                browseBtn.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFiles(Array.from(e.target.files));
+                    fileInput.value = '';
+                });
+
+                document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.currentChartType = btn.dataset.chartType;
+                        if (this.currentData) {
+                            this.renderCharts(this.currentData);
+                            this.showNotification(`Switched to ${this.currentChartType} charts 📊`, 'info');
+                        }
+                    });
+                });
+
+                document.getElementById('sampleDataBtn')?.addEventListener('click', () => this.loadSampleData());
+                document.getElementById('clearAllBtn')?.addEventListener('click', () => this.clearAllData());
+                document.getElementById('refreshChartsBtn')?.addEventListener('click', () => {
+                    if (this.currentData) this.renderCharts(this.currentData);
+                });
+                document.getElementById('exportAllChartsZipBtn')?.addEventListener('click', () => this.exportAllChartsAsZip());
+                document.getElementById('exportPdfBtn')?.addEventListener('click', () => this.exportToPDF());
+                document.getElementById('exportCsvBtn')?.addEventListener('click', () => this.exportToCSV());
+                document.getElementById('exportJsonBtn')?.addEventListener('click', () => this.exportToJSON());
+                document.getElementById('exportAllDataBtn')?.addEventListener('click', () => this.exportAllSavedData());
+                document.getElementById('generateShareUrlBtn')?.addEventListener('click', () => this.generateShareUrl());
+                document.getElementById('copyUrlBtn')?.addEventListener('click', () => this.copyShareUrl());
+                document.getElementById('generateQrBtn')?.addEventListener('click', () => this.generateQRCode());
+                document.getElementById('clearStorageBtn')?.addEventListener('click', () => this.clearLocalStorage());
+
+                document.getElementById('applyFilterBtn')?.addEventListener('click', () => this.applyFilters());
+                document.getElementById('resetFilterBtn')?.addEventListener('click', () => this.resetFilters());
+
+                const settingsDarkMode = document.getElementById('settingsDarkMode');
+                settingsDarkMode?.addEventListener('change', (e) => this.toggleTheme(e.target.checked));
+
+                document.getElementById('autoSave')?.addEventListener('change', (e) => this.saveSetting('autoSave', e.target.checked));
+                document.getElementById('animationSpeed')?.addEventListener('change', (e) => this.saveSetting('animationSpeed', e.target.value));
+
+                document.getElementById('prevPageBtn')?.addEventListener('click', () => this.changePage(-1));
+                document.getElementById('nextPageBtn')?.addEventListener('click', () => this.changePage(1));
+
+                document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+                    document.querySelector('.sidebar').classList.toggle('open');
+                });
+
+                const aiAssistant = document.getElementById('aiAssistant');
+                const aiHeader = document.querySelector('.ai-header');
+                aiHeader?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    aiAssistant.classList.toggle('minimized');
+                    const icon = aiHeader.querySelector('.ai-toggle-icon');
+                    if (icon) {
+                        icon.className = aiAssistant.classList.contains('minimized') ? 'fas fa-chevron-up ai-toggle-icon' : 'fas fa-chevron-down ai-toggle-icon';
+                    }
+                });
+
+                document.getElementById('sendAiBtn')?.addEventListener('click', () => this.sendAIMessage());
+                document.getElementById('aiInput')?.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendAIMessage();
+                });
+            }
+
+            handleFiles(files) {
+                const excelFiles = files.filter(f => f.name.match(/\.(xlsx|xls|csv)$/i));
+                if (excelFiles.length === 0) {
+                    this.showNotification('Please upload valid Excel or CSV files', 'error');
+                    return;
+                }
+                excelFiles.forEach(file => this.processExcelFile(file));
+            }
+
+            async processExcelFile(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                        if (jsonData.length === 0) throw new Error('File is empty');
+
+                        this.currentData = jsonData;
+                        this.currentFileName = file.name;
+                        this.filteredData = jsonData;
+
+                        this.addToFileList(file.name);
+                        if (document.getElementById('autoSave')?.checked) {
+                            this.saveToLocalStorage(file.name, jsonData);
+                        }
+
+                        this.updateStats(jsonData);
+                        this.updateStatsCards();
+                        this.renderCharts(jsonData);
+                        this.renderDataTable(jsonData);
+                        this.updateColumnFilter(jsonData);
+                        this.updateStatistics(jsonData);
+                        this.updateMemoryUsage();
+                        this.showNotification(`✅ ${file.name} loaded successfully!`, 'success');
+                    } catch (error) {
+                        this.showNotification(`Error: ${error.message}`, 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            renderCharts(data) {
+                const chartsGrid = document.getElementById('chartsGrid');
+                if (!data || data.length === 0) {
+                    chartsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file to see beautiful charts</p></div>';
+                    return;
+                }
+
+                const columns = Object.keys(data[0]);
+                const numericColumns = columns.filter(col => {
+                    return data.slice(0, 50).some(row => typeof row[col] === 'number');
+                });
+
+                if (numericColumns.length === 0) {
+                    chartsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>No numeric columns found for visualization</p></div>';
+                    return;
+                }
+
+                this.charts.forEach(chart => { if (chart && chart.destroy) chart.destroy(); });
+                this.charts = [];
+                chartsGrid.innerHTML = '';
+
+                const displayColumns = numericColumns.slice(0, 8);
+                const orangeGradients = ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'];
+
+                displayColumns.forEach((col, index) => {
+                    const chartCard = document.createElement('div');
+                    chartCard.className = 'chart-card';
+                    chartCard.innerHTML = `
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-chart-line"></i> ${col}</div>
+                            <button class="download-chart-btn" data-column="${col}" style="background:linear-gradient(135deg,#f97316,#06b6d4); border:none; padding:6px 12px; border-radius:8px; color:white; cursor:pointer; font-size:12px">📸 Download</button>
+                        </div>
+                        <canvas id="chart_${index}" class="chart-canvas"></canvas>
+                        <div class="chart-stats">
+                            <span>📊 Data Points: ${data.length}</span>
+                            <span>📈 Max: ${Math.max(...data.slice(0,50).map(r => parseFloat(r[col]) || 0)).toFixed(2)}</span>
+                            <span>📉 Min: ${Math.min(...data.slice(0,50).map(r => parseFloat(r[col]) || 0)).toFixed(2)}</span>
+                        </div>
+                    `;
+                    chartsGrid.appendChild(chartCard);
+
+                    const ctx = document.getElementById(`chart_${index}`).getContext('2d');
+                    const labels = data.slice(0, 15).map((_, i) => `Row ${i + 1}`);
+                    const values = data.slice(0, 15).map(row => {
+                        const val = row[col];
+                        return typeof val === 'number' ? val : (parseFloat(val) || 0);
+                    });
+
+                    const chartConfig = this.getChartConfig(this.currentChartType, labels, values, col, orangeGradients[index % orangeGradients.length]);
+                    const chart = new Chart(ctx, chartConfig);
+                    this.charts.push(chart);
+
+                    chartCard.querySelector('.download-chart-btn').addEventListener('click', () => {
+                        // Create a temporary canvas with dark background for download
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = chart.canvas.width;
+                        tempCanvas.height = chart.canvas.height;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.fillStyle = '#0a0a0f';
+                        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                        tempCtx.drawImage(chart.canvas, 0, 0);
+
+                        const link = document.createElement('a');
+                        link.download = `chart_${col}.png`;
+                        link.href = tempCanvas.toDataURL('image/png');
+                        link.click();
+                        this.showNotification(`Chart ${col} downloaded!`, 'success');
+                    });
+                });
+
+                document.getElementById('totalCharts').textContent = displayColumns.length;
+            }
+
+            getChartConfig(type, labels, values, title, color) {
+                const speed = parseInt(document.getElementById('animationSpeed')?.value || 500);
+
+                const baseOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: speed, easing: 'easeInOutQuart' },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: '#0a0a0f',
+                            titleColor: '#06b6d4',
+                            bodyColor: '#f97316',
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.raw || context.parsed.y || context.parsed;
+                                    return `${title}: ${value}`;
+                                }
+                            }
+                        },
+                        legend: { labels: { color: '#ffffff', font: { size: 11 } } }
+                    }
+                };
+
+                switch(type) {
+                    case 'bar':
+                        return {
+                            type: 'bar',
+                            data: { labels, datasets: [{ label: title, data: values, backgroundColor: color || '#f97316', borderRadius: 8 }] },
+                            options: baseOptions
+                        };
+                    case 'line':
+                        return {
+                            type: 'line',
+                            data: { labels, datasets: [{ label: title, data: values, borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#f97316', pointRadius: 5 }] },
+                            options: baseOptions
+                        };
+                    case 'pie':
+                        return {
+                            type: 'pie',
+                            data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'], borderWidth: 2 }] },
+                            options: baseOptions
+                        };
+                    case 'doughnut':
+                        return {
+                            type: 'doughnut',
+                            data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'], cutout: '60%' }] },
+                            options: baseOptions
+                        };
+                    case 'radar':
+                        return {
+                            type: 'radar',
+                            data: { labels: labels.slice(0, 8), datasets: [{ label: title, data: values.slice(0, 8), borderColor: '#06b6d4', backgroundColor: 'rgba(249, 115, 22, 0.2)', pointBackgroundColor: '#f97316' }] },
+                            options: baseOptions
+                        };
+                    case 'polarArea':
+                        return {
+                            type: 'polarArea',
+                            data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'] }] },
+                            options: baseOptions
+                        };
+                    case 'area':
+                        return {
+                            type: 'line',
+                            data: { labels, datasets: [{ label: title, data: values, borderColor: '#06b6d4', backgroundColor: 'rgba(249, 115, 22, 0.3)', fill: true, tension: 0.3 }] },
+                            options: baseOptions
+                        };
+                    case 'horizontalBar':
+                        return {
+                            type: 'bar',
+                            data: { labels, datasets: [{ label: title, data: values, backgroundColor: '#f97316', borderRadius: 8 }] },
+                            options: { ...baseOptions, indexAxis: 'y' }
+                        };
+                    default:
+                        return this.getChartConfig('bar', labels, values, title, color);
+                }
+            }
+
+            async exportAllChartsAsZip() {
+                if (this.charts.length === 0) {
+                    this.showNotification('No charts to export', 'error');
+                    return;
+                }
+
+                const zip = new JSZip();
+                const promises = [];
+
+                this.showNotification(`Preparing ${this.charts.length} charts for download...`, 'info');
+
+                for (let i = 0; i < this.charts.length; i++) {
+                    const chart = this.charts[i];
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = chart.canvas.width;
+                    tempCanvas.height = chart.canvas.height;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.fillStyle = '#0a0a0f';
+                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    tempCtx.drawImage(chart.canvas, 0, 0);
+
+                    const imageData = tempCanvas.toDataURL('image/png').split(',')[1];
+                    zip.file(`chart_${i+1}.png`, imageData, { base64: true });
+                }
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                saveAs(content, 'dataviz_charts.zip');
+                this.showNotification(`${this.charts.length} charts exported as ZIP! 📦`, 'success');
+            }
+
+            updateStats(data) {
+                if (!data) return;
+                document.getElementById('totalRows').textContent = data.length.toLocaleString();
+                document.getElementById('totalCols').textContent = Object.keys(data[0]).length;
+            }
+
+            updateStatsCards() {
+                if (!this.currentData) return;
+                const columns = Object.keys(this.currentData[0]);
+                const numericCols = columns.filter(col => {
+                    return this.currentData.some(row => typeof row[col] === 'number');
+                });
+
+                if (numericCols.length > 0) {
+                    const firstNumeric = numericCols[0];
+                    const values = this.currentData.map(row => parseFloat(row[firstNumeric])).filter(v => !isNaN(v));
+                    if (values.length > 0) {
+                        const total = values.reduce((a,b) => a+b, 0);
+                        document.getElementById('totalProfit').textContent = `$${total.toLocaleString()}`;
+                        document.getElementById('totalCustomers').textContent = values.length.toLocaleString();
+                        const avg = total / values.length;
+                        document.getElementById('avgOrderValue').textContent = `$${avg.toFixed(2)}`;
+                        const growth = ((values[values.length-1] - values[0]) / values[0] * 100).toFixed(1);
+                        document.getElementById('growthRate').textContent = `${growth}%`;
+                    }
+                }
+            }
+
+            renderDataTable(data) {
+                if (!data) return;
+                const displayData = this.filteredData || data;
+                const start = (this.currentPageNum - 1) * this.rowsPerPage;
+                const pageData = displayData.slice(start, start + this.rowsPerPage);
+                const columns = Object.keys(data[0]);
+
+                document.getElementById('tableHead').innerHTML = `<tr>${columns.map(col => `<th>${col}</th>`).join('')}</tr>`;
+                document.getElementById('tableBody').innerHTML = pageData.map(row => `<tr>${columns.map(col => `<td>${row[col] !== undefined ? String(row[col]).substring(0, 50) : '-'}</td>`).join('')}</tr>`).join('');
+
+                const totalPages = Math.ceil(displayData.length / this.rowsPerPage);
+                document.getElementById('pageInfo').textContent = `Page ${this.currentPageNum} of ${totalPages || 1}`;
+            }
+
+            applyFilters() {
+                this.searchText = document.getElementById('tableSearch')?.value || '';
+                this.selectedColumn = document.getElementById('columnFilter')?.value || '';
+
+                if (!this.currentData) return;
+
+                let filtered = [...this.currentData];
+
+                if (this.searchText) {
+                    const search = this.searchText.toLowerCase();
+                    filtered = filtered.filter(row => {
+                        return Object.values(row).some(val =>
+                            String(val).toLowerCase().includes(search)
+                        );
+                    });
+                }
+
+                this.filteredData = filtered;
+                this.currentPageNum = 1;
+                this.renderDataTable(this.currentData);
+                this.showNotification(`Found ${filtered.length} matching rows`, 'info');
+            }
+
+            resetFilters() {
+                document.getElementById('tableSearch').value = '';
+                document.getElementById('columnFilter').value = '';
+                this.searchText = '';
+                this.selectedColumn = '';
+                this.filteredData = this.currentData;
+                this.currentPageNum = 1;
+                this.renderDataTable(this.currentData);
+                this.showNotification('Filters reset', 'info');
+            }
+
+            updateColumnFilter(data) {
+                if (!data) return;
+                const filterSelect = document.getElementById('columnFilter');
+                if (filterSelect) {
+                    filterSelect.innerHTML = '<option value="">All Columns</option>' +
+                        Object.keys(data[0]).map(col => `<option value="${col}">${col}</option>`).join('');
+                }
+            }
+
+            updateStatistics(data) {
+                if (!data) return;
+                const columns = Object.keys(data[0]);
+                const container = document.getElementById('statisticsContent');
+                if (!container) return;
+
+                container.innerHTML = columns.map(col => {
+                    const values = data.map(row => parseFloat(row[col])).filter(v => !isNaN(v));
+                    if (values.length > 0) {
+                        const sum = values.reduce((a,b) => a+b, 0);
+                        const mean = sum / values.length;
+                        const min = Math.min(...values);
+                        const max = Math.max(...values);
+                        const median = values.sort((a,b) => a-b)[Math.floor(values.length/2)];
+                        return `<div class="stat-item">
+                            <div class="stat-name">📊 ${col}</div>
+                            <div style="font-size:12px">Mean: ${mean.toFixed(2)} | Median: ${median.toFixed(2)}</div>
+                            <div style="font-size:12px">Min: ${min} | Max: ${max}</div>
+                            <div style="font-size:11px; color:#06b6d4">Total: ${sum.toLocaleString()}</div>
+                        </div>`;
+                    }
+                    const unique = new Set(data.map(row => String(row[col])));
+                    return `<div class="stat-item">
+                        <div class="stat-name">📝 ${col}</div>
+                        <div style="font-size:12px">Unique: ${unique.size} values</div>
+                        <div style="font-size:12px">Total: ${data.length} entries</div>
+                    </div>`;
+                }).join('');
+            }
+
+            addToFileList(fileName) {
+                const fileList = document.getElementById('fileList');
+                if (Array.from(fileList.children).some(c => c.querySelector('.file-name')?.textContent === fileName)) return;
+
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <i class="fas fa-file-excel"></i>
+                    <span class="file-name">${fileName}</span>
+                    <button class="file-remove" data-file="${fileName}">✕</button>
+                `;
+                fileItem.querySelector('.file-remove').addEventListener('click', () => {
+                    fileItem.remove();
+                    if (this.currentFileName === fileName) {
+                        this.currentData = null;
+                        this.clearAllData();
+                    }
+                });
+                fileList.appendChild(fileItem);
+            }
+
+            loadSampleData() {
+                const sampleData = [
+                    { Month: 'Jan', Sales: 12500, Expenses: 8500, Profit: 4000, Growth: 5.2 },
+                    { Month: 'Feb', Sales: 15200, Expenses: 9200, Profit: 6000, Growth: 6.8 },
+                    { Month: 'Mar', Sales: 18500, Expenses: 10500, Profit: 8000, Growth: 7.5 },
+                    { Month: 'Apr', Sales: 14200, Expenses: 8800, Profit: 5400, Growth: 4.9 },
+                    { Month: 'May', Sales: 22500, Expenses: 12800, Profit: 9700, Growth: 8.2 },
+                    { Month: 'Jun', Sales: 25800, Expenses: 14200, Profit: 11600, Growth: 9.1 },
+                    { Month: 'Jul', Sales: 28500, Expenses: 15800, Profit: 12700, Growth: 10.5 },
+                    { Month: 'Aug', Sales: 26200, Expenses: 14500, Profit: 11700, Growth: 9.8 },
+                    { Month: 'Sep', Sales: 23500, Expenses: 13200, Profit: 10300, Growth: 8.7 },
+                    { Month: 'Oct', Sales: 21500, Expenses: 11800, Profit: 9700, Growth: 7.9 },
+                    { Month: 'Nov', Sales: 19800, Expenses: 11200, Profit: 8600, Growth: 7.2 },
+                    { Month: 'Dec', Sales: 24500, Expenses: 13800, Profit: 10700, Growth: 8.9 }
+                ];
+
+                this.currentData = sampleData;
+                this.currentFileName = 'sample_data.xlsx';
+                this.filteredData = sampleData;
+
+                this.addToFileList('sample_data.xlsx');
+                this.updateStats(sampleData);
+                this.updateStatsCards();
+                this.renderCharts(sampleData);
+                this.renderDataTable(sampleData);
+                this.updateColumnFilter(sampleData);
+                this.updateStatistics(sampleData);
+                this.showNotification('📊 Sample data loaded!', 'success');
+            }
+
+            clearAllData() {
+                this.currentData = null;
+                this.filteredData = null;
+                document.getElementById('fileList').innerHTML = '';
+                document.getElementById('chartsGrid').innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file to see beautiful charts</p></div>';
+                document.getElementById('tableHead').innerHTML = '';
+                document.getElementById('tableBody').innerHTML = '';
+                document.getElementById('totalRows').textContent = '0';
+                document.getElementById('totalCols').textContent = '0';
+                document.getElementById('totalCharts').textContent = '0';
+                document.getElementById('totalProfit').textContent = '$0';
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('growthRate').textContent = '0%';
+                document.getElementById('avgOrderValue').textContent = '$0';
+                this.showNotification('All data cleared', 'info');
+            }
+
+            switchPage(page) {
+                this.currentPage = page;
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === page) item.classList.add('active');
+                });
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`${page}Page`).classList.add('active');
+
+                const titles = { dashboard: 'Dashboard', analytics: 'Analytics', files: 'My Files', share: 'Share', settings: 'Settings' };
+                document.getElementById('pageTitle').textContent = titles[page];
+
+                if (page === 'analytics' && this.currentData) this.updateStatistics(this.currentData);
+                if (page === 'files') this.loadSavedFilesList();
+            }
+
+            changePage(delta) {
+                const displayData = this.filteredData || this.currentData;
+                if (!displayData) return;
+                const totalPages = Math.ceil(displayData.length / this.rowsPerPage);
+                const newPage = this.currentPageNum + delta;
+                if (newPage >= 1 && newPage <= totalPages) {
+                    this.currentPageNum = newPage;
+                    this.renderDataTable(this.currentData);
+                }
+            }
+
+            generateShareUrl() {
+                if (!this.currentData) {
+                    this.showNotification('No data to share!', 'error');
+                    return;
+                }
+                try {
+                    const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(this.currentData));
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('data', compressed);
+                    document.getElementById('shareUrl').value = url.toString();
+                    this.showNotification('Share URL generated!', 'success');
+                } catch(e) {
+                    this.showNotification('Data too large for URL', 'error');
+                }
+            }
+
+            copyShareUrl() {
+                const urlInput = document.getElementById('shareUrl');
+                if (!urlInput.value) {
+                    this.showNotification('Generate URL first!', 'error');
+                    return;
+                }
+                navigator.clipboard.writeText(urlInput.value);
+                this.showNotification('URL copied!', 'success');
+            }
+
+            generateQRCode() {
+                const url = document.getElementById('shareUrl').value;
+                if (!url) {
+                    this.showNotification('Generate URL first!', 'error');
+                    return;
+                }
+                const qrContainer = document.getElementById('qrCodeContainer');
+                qrContainer.style.display = 'flex';
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#f97316',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                this.showNotification('QR Code generated! Scan to share', 'success');
+            }
+
+            async exportToPDF() {
+                const element = document.getElementById('dashboardPage');
+                if (!element) {
+                    this.showNotification('Nothing to export', 'error');
+                    return;
+                }
+
+                try {
+                    const opt = {
+                        margin: [0.5, 0.5, 0.5, 0.5],
+                        filename: 'dataviz_dashboard.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0f', logging: false },
+                        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                    };
+                    await html2pdf().set(opt).from(element).save();
+                    this.showNotification('PDF exported successfully!', 'success');
+                } catch (error) {
+                    this.showNotification('PDF export failed. Try using browser print instead.', 'error');
+                }
+            }
+
+            exportToCSV() {
+                if (!this.currentData) {
+                    this.showNotification('No data to export', 'error');
+                    return;
+                }
+                const columns = Object.keys(this.currentData[0]);
+                const rows = [columns.join(',')];
+                this.currentData.forEach(row => {
+                    rows.push(columns.map(col => `"${String(row[col] || '').replace(/"/g, '""')}"`).join(','));
+                });
+                const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+                saveAs(blob, 'data_export.csv');
+                this.showNotification('CSV exported!', 'success');
+            }
+
+            exportToJSON() {
+                if (!this.currentData) {
+                    this.showNotification('No data to export', 'error');
+                    return;
+                }
+                const blob = new Blob([JSON.stringify(this.currentData, null, 2)], { type: 'application/json' });
+                saveAs(blob, 'data_export.json');
+                this.showNotification('JSON exported!', 'success');
+            }
+
+            exportAllSavedData() {
+                const data = localStorage.getItem('dataviz_files');
+                if (!data) {
+                    this.showNotification('No saved data', 'error');
+                    return;
+                }
+                const blob = new Blob([data], { type: 'application/json' });
+                saveAs(blob, 'dataviz_backup.json');
+                this.showNotification('Backup exported!', 'success');
+            }
+
+            saveToLocalStorage(fileName, data) {
+                const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
+                saved[fileName] = { data, timestamp: new Date().toISOString() };
+                localStorage.setItem('dataviz_files', JSON.stringify(saved));
+                this.updateStorageInfo();
+            }
+
+            loadStoredData() {
+                const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
+                const files = Object.keys(saved);
+                if (files.length && !this.currentData) {
+                    const firstFile = files[0];
+                    this.currentData = saved[firstFile].data;
+                    this.currentFileName = firstFile;
+                    this.filteredData = this.currentData;
+                    this.updateStats(this.currentData);
+                    this.updateStatsCards();
+                    this.renderCharts(this.currentData);
+                    this.renderDataTable(this.currentData);
+                    files.forEach(f => this.addToFileList(f));
+                }
+            }
+
+            loadSavedFilesList() {
+                const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
+                const container = document.getElementById('savedFilesList');
+                if (!container) return;
+
+                if (Object.keys(saved).length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-database"></i><p>No saved files</p></div>';
+                    return;
+                }
+
+                container.innerHTML = Object.entries(saved).map(([name, info]) => `
+                    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(249,115,22,0.3); border-radius:12px; padding:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center">
+                        <div>
+                            <i class="fas fa-file-excel" style="color:#f97316"></i> ${name}
+                            <div style="font-size:11px; color:#8a8a9a">${new Date(info.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div>
+                            <button class="load-file-btn" data-file="${name}" style="background:linear-gradient(135deg,#f97316,#ea580c); border:none; padding:6px 12px; border-radius:8px; color:white; margin-right:8px; cursor:pointer">Load</button>
+                            <button class="delete-file-btn" data-file="${name}" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; padding:6px 12px; border-radius:8px; color:#ef4444; cursor:pointer">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.load-file-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
+                        const data = saved[btn.dataset.file];
+                        if (data) {
+                            this.currentData = data.data;
+                            this.currentFileName = btn.dataset.file;
+                            this.filteredData = this.currentData;
+                            this.updateStats(this.currentData);
+                            this.updateStatsCards();
+                            this.renderCharts(this.currentData);
+                            this.renderDataTable(this.currentData);
+                            this.switchPage('dashboard');
+                            this.showNotification(`Loaded ${btn.dataset.file}`, 'success');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.delete-file-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
+                        delete saved[btn.dataset.file];
+                        localStorage.setItem('dataviz_files', JSON.stringify(saved));
+                        this.loadSavedFilesList();
+                        this.updateStorageInfo();
+                        this.showNotification(`Deleted ${btn.dataset.file}`, 'info');
+                    });
+                });
+            }
+
+            clearLocalStorage() {
+                if (confirm('Clear all saved data? This cannot be undone.')) {
+                    localStorage.removeItem('dataviz_files');
+                    localStorage.removeItem('dataviz_settings');
+                    this.loadSavedFilesList();
+                    this.updateStorageInfo();
+                    this.showNotification('All saved data cleared', 'info');
+                }
+            }
+
+            updateStorageInfo() {
+                let total = 0;
+                for (let i = 0; i < localStorage.length; i++) {
+                    total += (localStorage.getItem(localStorage.key(i))?.length || 0);
+                }
+                document.getElementById('storageUsed').textContent = `${(total / (1024 * 1024)).toFixed(2)} MB`;
+            }
+
+            updateMemoryUsage() {
+                if (performance.memory) {
+                    document.getElementById('memoryUsage').textContent = `${(performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(0)} MB`;
+                }
+            }
+
+            startMemoryMonitor() {
+                setInterval(() => this.updateMemoryUsage(), 5000);
+            }
+
+            initTheme() {
+                const saved = localStorage.getItem('dataviz_settings');
+                let isDark = true;
+                if (saved) {
+                    isDark = JSON.parse(saved).darkMode !== false;
+                }
+                if (!isDark) {
+                    this.toggleTheme(false);
+                }
+                const settingsDarkMode = document.getElementById('settingsDarkMode');
+                if (settingsDarkMode) settingsDarkMode.checked = isDark;
+            }
+
+            toggleTheme(isDark) {
+                if (isDark) {
+                    document.body.style.background = '#0a0a0f';
+                    document.body.style.color = '#ffffff';
+                } else {
+                    document.body.style.background = '#f0f0f5';
+                    document.body.style.color = '#1a1a2e';
+                }
+                this.saveSetting('darkMode', isDark);
+                if (this.currentData) this.renderCharts(this.currentData);
+            }
+
+            saveSetting(key, value) {
+                const settings = JSON.parse(localStorage.getItem('dataviz_settings') || '{}');
+                settings[key] = value;
+                localStorage.setItem('dataviz_settings', JSON.stringify(settings));
+            }
+
+            // ULTRA INTELLIGENT AI ASSISTANT
+            sendAIMessage() {
+                const input = document.getElementById('aiInput');
+                const message = input.value.trim();
+                if (!message) return;
+
+                this.addAIMessage('user', message);
+                input.value = '';
+
+                setTimeout(() => {
+                    const response = this.getIntelligentResponse(message.toLowerCase());
+                    this.addAIMessage('bot', response);
+                }, 500);
+            }
+
+            getIntelligentResponse(query) {
+                if (!this.currentData) {
+                    return "📂 **No Data Loaded**\n\nPlease upload an Excel file first. You can:\n• Drag & drop an Excel/CSV file\n• Click 'Browse Files' to select\n• Click 'Load Sample' for demo data\n\nOnce loaded, I can help analyze your data!";
+                }
+
+                const columns = Object.keys(this.currentData[0]);
+                const numericCols = columns.filter(col => this.currentData.some(row => typeof row[col] === 'number'));
+                const totalRows = this.currentData.length;
+
+                // Statistics queries
+                if (query.includes('statistics') || query.includes('stats') || query.includes('overview')) {
+                    return `📊 **Data Statistics Overview**\n\n` +
+                           `• **File**: ${this.currentFileName}\n` +
+                           `• **Total Rows**: ${totalRows.toLocaleString()}\n` +
+                           `• **Total Columns**: ${columns.length}\n` +
+                           `• **Numeric Columns**: ${numericCols.length}\n` +
+                           `• **Text Columns**: ${columns.length - numericCols.length}\n\n` +
+                           `**Columns**: ${columns.join(', ')}\n\n` +
+                           `💡 Tip: Go to Analytics page for detailed column statistics!`;
+                }
+
+                // Average query
+                if (query.includes('average') || query.includes('mean')) {
+                    for (const col of numericCols) {
+                        if (query.includes(col.toLowerCase())) {
+                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+                            const avg = values.reduce((a,b) => a+b, 0) / values.length;
+                            return `📈 **Average ${col}**: ${avg.toFixed(2)}\n\nBased on ${values.length} data points.`;
+                        }
+                    }
+                    if (numericCols.length > 0) {
+                        const avgValues = numericCols.map(col => {
+                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+                            const avg = values.reduce((a,b) => a+b, 0) / values.length;
+                            return `• ${col}: ${avg.toFixed(2)}`;
+                        });
+                        return `📊 **Averages for Numeric Columns**\n\n${avgValues.join('\n')}`;
+                    }
+                }
+
+                // Chart recommendation
+                if (query.includes('chart') || query.includes('visualize') || query.includes('graph')) {
+                    return `📈 **Chart Recommendations**\n\n` +
+                           `Based on your data (${numericCols.length} numeric columns):\n\n` +
+                           `• **Bar Chart** - Best for comparing ${numericCols[0] || 'values'} across categories\n` +
+                           `• **Line Chart** - Perfect for showing trends over time\n` +
+                           `• **Pie/Doughnut** - Shows distribution of ${numericCols[0] || 'data'}\n` +
+                           `• **Radar Chart** - Compare multiple metrics at once\n` +
+                           `• **Area Chart** - Emphasize magnitude of change\n\n` +
+                           `💡 Click the chart type buttons above your dashboard to switch!`;
+                }
+
+                // Row count
+                if (query.includes('how many rows') || query.includes('row count') || query.includes('total rows')) {
+                    return `📊 Your dataset has **${totalRows.toLocaleString()} rows** of data.`;
+                }
+
+                // Column info
+                if (query.includes('columns') || query.includes('what columns')) {
+                    return `📋 **Available Columns** (${columns.length} total)\n\n${columns.map((col, i) => `${i+1}. ${col}`).join('\n')}`;
+                }
+
+                // Summary
+                if (query.includes('summary') || query.includes('overview')) {
+                    const sample = this.currentData[0];
+                    const sampleText = Object.entries(sample).slice(0, 3).map(([k,v]) => `${k}: ${v}`).join(', ');
+                    return `📋 **Data Summary**\n\n` +
+                           `• **File**: ${this.currentFileName}\n` +
+                           `• **Rows**: ${totalRows.toLocaleString()}\n` +
+                           `• **Columns**: ${columns.length}\n` +
+                           `• **Numeric Columns**: ${numericCols.length}\n\n` +
+                           `**Sample Row**: ${sampleText}...\n\n` +
+                           `💡 Go to Analytics page for complete data table!`;
+                }
+
+                // Highest/Max query
+                if (query.includes('highest') || query.includes('max') || query.includes('maximum') || query.includes('top')) {
+                    for (const col of numericCols) {
+                        if (query.includes(col.toLowerCase())) {
+                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+                            const max = Math.max(...values);
+                            const maxRow = this.currentData.find(r => parseFloat(r[col]) === max);
+                            return `🏆 **Highest ${col}**: ${max.toLocaleString()}\n\nFound in row: ${JSON.stringify(maxRow).substring(0, 200)}`;
+                        }
+                    }
+                    if (numericCols.length > 0) {
+                        const maxValues = numericCols.map(col => {
+                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+                            const max = Math.max(...values);
+                            return `• ${col}: ${max.toLocaleString()}`;
+                        });
+                        return `📊 **Maximum Values**\n\n${maxValues.join('\n')}`;
+                    }
+                }
+
+                // Lowest/Min query
+                if (query.includes('lowest') || query.includes('min') || query.includes('minimum')) {
+                    for (const col of numericCols) {
+                        if (query.includes(col.toLowerCase())) {
+                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+                            const min = Math.min(...values);
+                            return `📉 **Lowest ${col}**: ${min.toLocaleString()}`;
+                        }
+                    }
+                }
+
+                // Trend query
+                if (query.includes('trend') || query.includes('increase') || query.includes('decrease')) {
+                    if (numericCols.length > 0) {
+                        const firstCol = numericCols[0];
+                        const values = this.currentData.map(r => parseFloat(r[firstCol])).filter(v => !isNaN(v));
+                        if (values.length >= 2) {
+                            const first = values[0];
+                            const last = values[values.length - 1];
+                            const change = ((last - first) / first * 100).toFixed(1);
+                            const direction = change >= 0 ? 'increasing ↗️' : 'decreasing ↘️';
+                            return `📈 **Trend Analysis for ${firstCol}**\n\n` +
+                                   `• Start: ${first.toLocaleString()}\n` +
+                                   `• End: ${last.toLocaleString()}\n` +
+                                   `• Change: ${change}% (${direction})\n\n` +
+                                   `The data shows a ${direction} trend over ${values.length} periods.`;
+                        }
+                    }
+                }
+
+                // Correlation query
+                if (query.includes('correlation') || query.includes('relationship')) {
+                    if (numericCols.length >= 2) {
+                        return `🔗 **Correlation Analysis**\n\n` +
+                               `You have ${numericCols.length} numeric columns that can be compared.\n\n` +
+                               `To find relationships:\n` +
+                               `1. Use Scatter plot chart type\n` +
+                               `2. Compare columns like ${numericCols[0]} vs ${numericCols[1]}\n` +
+                               `3. Look for patterns in the visualization\n\n` +
+                               `💡 Switch to Scatter chart and select different columns!`;
+                    }
+                    return `⚠️ Need at least 2 numeric columns for correlation analysis. You have ${numericCols.length} numeric columns.`;
+                }
+
+                // Help
+                if (query.includes('help') || query.includes('what can you do') || query.includes('capabilities')) {
+                    return `🧠 **Ultra-Intelligent AI Assistant - Capabilities**\n\n` +
+                           `**Data Analysis**\n` +
+                           `• "Show me statistics" - Get data overview\n` +
+                           `• "Average of [column]" - Calculate mean\n` +
+                           `• "Highest/Lowest in [column]" - Find extremes\n` +
+                           `• "Trend analysis" - See patterns over time\n\n` +
+                           `**Visualization**\n` +
+                           `• "What charts to use?" - Get recommendations\n` +
+                           `• Switch chart types using buttons above\n\n` +
+                           `**Data Exploration**\n` +
+                           `• "How many rows?" - Row count\n` +
+                           `• "What columns?" - List all columns\n` +
+                           `• "Summarize my data" - Quick overview\n\n` +
+                           `**Export & Share**\n` +
+                           `• Export charts as ZIP\n` +
+                           `• Generate shareable URLs\n` +
+                           `• Create QR codes\n` +
+                           `• Export to PDF/CSV/JSON\n\n` +
+                           `💡 Just ask naturally in plain English!`;
+                }
+
+                // Default intelligent response
+                return `🧠 **I can help with your data!**\n\n` +
+                       `Try asking:\n` +
+                       `• "Show me statistics"\n` +
+                       `• "Average of ${numericCols[0] || 'sales'}"\n` +
+                       `• "What charts should I use?"\n` +
+                       `• "Trend analysis"\n` +
+                       `• "How many rows do I have?"\n` +
+                       `• "Help" for all features\n\n` +
+                       `Your data has ${totalRows} rows and ${columns.length} columns. What would you like to know?`;
+            }
+
+            addAIMessage(sender, text) {
+                const container = document.getElementById('aiMessages');
+                const div = document.createElement('div');
+                div.className = `ai-message ${sender}`;
+                div.innerHTML = `<i class="fas fa-${sender === 'bot' ? 'brain' : 'user'}"></i><p style="white-space: pre-line;">${text}</p>`;
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+
+                while (container.children.length > 40) {
+                    container.removeChild(container.children[0]);
+                }
+            }
+
+            showNotification(message, type) {
+                const container = document.getElementById('notificationContainer');
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                container.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { window.app = new DataVizPro(); });
+
+        // Fix for slider switches
+        document.querySelectorAll('.switch').forEach(sw => {
+            const input = sw.querySelector('input');
+            const slider = sw.querySelector('span');
+            if (input && slider) {
+                slider.style.position = 'absolute';
+                slider.style.cursor = 'pointer';
+                slider.style.top = '0';
+                slider.style.left = '0';
+                slider.style.right = '0';
+                slider.style.bottom = '0';
+                slider.style.backgroundColor = '#2a2a35';
+                slider.style.transition = '0.3s';
+                slider.style.borderRadius = '34px';
+
+                const before = document.createElement('span');
+                before.style.position = 'absolute';
+                before.style.content = '""';
+                before.style.height = '20px';
+                before.style.width = '20px';
+                before.style.left = '3px';
+                before.style.bottom = '3px';
+                before.style.backgroundColor = '#f97316';
+                before.style.transition = '0.3s';
+                before.style.borderRadius = '50%';
+                slider.appendChild(before);
+
+                input.addEventListener('change', () => {
+                    if (input.checked) {
+                        before.style.transform = 'translateX(26px)';
+                    } else {
+                        before.style.transform = 'translateX(0)';
+                    }
+                });
+
+                if (input.checked) {
+                    before.style.transform = 'translateX(26px)';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+/* Light Mode Styles - Activated by body.light-mode */
+body.light-mode {
+    background: #f5f5f7;
+    color: #1a1a2e;
+}
+
+body.light-mode .sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .main-content {
+    background: #f5f5f7;
+}
+
+body.light-mode .main-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .header-left h1 {
+    background: linear-gradient(135deg, #1a1a2e, #2d2d5e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+body.light-mode .nav-item {
+    color: #4a4a6a;
+}
+
+body.light-mode .nav-item:hover {
+    background: rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .stat-card,
+body.light-mode .chart-card,
+body.light-mode .data-table-container,
+body.light-mode .statistics-panel,
+body.light-mode .share-card,
+body.light-mode .settings-section {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .upload-zone {
+    background: rgba(124, 58, 237, 0.03);
+    border-color: rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .search-input,
+body.light-mode .filter-select,
+body.light-mode #shareUrl,
+body.light-mode #aiInput {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #1a1a2e;
+}
+
+body.light-mode .file-item {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .ai-assistant {
+    background: white;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .ai-message p {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .ai-message.user p {
+    background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+    color: white;
+}
+
+body.light-mode .slider {
+    background-color: #ddd;
+}
+
+body.light-mode .stat-value {
+    color: #7c3aed;
+}
+
+body.light-mode .chart-title {
+    color: #7c3aed;
+}
