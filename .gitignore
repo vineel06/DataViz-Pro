@@ -1,4 +1,4 @@
-# IDE and System Files - DON'T push these!
+# IDE and System Files
 .idea/
 .vscode/
 __pycache__/
@@ -6,10 +6,16 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+
+# Virtual Environment
 env/
 venv/
 .venv/
+
+# OS Files
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Logs
 *.log
