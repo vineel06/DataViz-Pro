@@ -1,14 +1,15 @@
 📊 DataViz Pro - Ultra-Intelligent AI-Powered Excel Analytics Dashboard
 Zero Cost. Zero Login. Zero Data Leaving Your Device. Ultra-Intelligent AI Assistant.
-DataViz Pro is a completely free, open-source Excel analytics dashboard with an ultra-intelligent AI assistant that runs entirely in your browser. Upload your spreadsheets and get beautiful, interactive charts instantly - no account, no credit card, no hidden costs.
+DataViz Pro is a completely free, open-source Excel analytics dashboard with an ultra-intelligent AI assistant that runs entirely in your browser. 
+Upload your spreadsheets and get beautiful, interactive charts instantly - no account, no credit card, no hidden costs.
 
 🎨 Theme: Sunset Orange & Neon Blue
-Element	Color
-Primary Theme	Sunset Orange (#f97316)
-Accent  Color	Neon Blue (#06b6d4)
-Charts	Orange  Gradients
-Hover   Effects	Blue Neon Glow
-Background	    Dark/Light Mode
+Element	            Color
+Primary     Theme	   Sunset Orange (#f97316)
+Accent      Color	   Neon Blue (#06b6d4)
+Charts	   Orange   Gradients
+Hover       Effects  Blue Neon Glow
+Background	         Dark/Light Mode
 
 🚀 Quick Start Guide
 For End Users (No technical skills needed)
@@ -64,23 +65,23 @@ bash
 📋 Features
 🧠 Ultra-Intelligent AI Assistant
 Natural Language Understanding - Ask questions in plain English
-Data Statistics - "Show me statistics", "Average of sales"
-Trend Analysis - "Show trends", "Is my data increasing?"
-Chart Recommendations - "What charts should I use?"
-Data Exploration - "How many rows?", "List all columns"
-Find Extremes - "Highest profit", "Lowest expenses"
-Correlation Analysis - "Find relationships between columns"
+Data Statistics                - "Show me statistics", "Average of sales"
+Trend Analysis                 - "Show trends", "Is my data increasing?"
+Chart Recommendations          - "What charts should I use?"
+Data Exploration               - "How many rows?", "List all columns"
+Find Extremes                  - "Highest profit", "Lowest expenses"
+Correlation Analysis           - "Find relationships between columns"
 
 📊 Charts & Visualization
 Chart Type	     Description
 Bar Chart	     Compare categories
 Line Chart	     Show trends over time
 Pie Chart	     Show distribution
-Doughnut Chart	 Circular distribution
+Doughnut Chart	  Circular distribution
 Radar Chart	     Compare multiple metrics
 Polar Area	     Circular data representation
 Area Chart	     Emphasize magnitude of change
-Horizontal Bar	 Sideways bar comparison
+Horizontal Bar	  Sideways bar comparison
 
 📈 Dashboard Features
 Auto-detection of numeric columns
@@ -92,20 +93,20 @@ Export all charts as ZIP file
 Dark/Light mode toggle (in settings)
 
 🔍 Data Analysis
-Data Table View - See raw data in tabular format
-Search & Filter - Find specific data points
+Data Table View   - See raw data in tabular format
+Search & Filter   - Find specific data points
 Column Statistics - Mean, median, min, max, unique values
-Column Filtering - Focus on specific columns
-Pagination - Navigate through large datasets
+Column Filtering  - Focus on specific columns
+Pagination        - Navigate through large datasets
 
 🔗 Sharing & Export
 Feature	     Description
-Share URL	 Compressed data in URL
+Share URL	  Compressed data in URL
 QR Code	     Mobile-friendly sharing
-PDF Export	 Full dashboard export
-CSV Export	 Raw data export
-JSON Export	 Developer-friendly format
-ZIP Export	 All charts in one file
+PDF Export	  Full dashboard export
+CSV Export	  Raw data export
+JSON Export	  Developer-friendly format
+ZIP Export	  All charts in one file
 
 💾 Data Management
 Auto-save to localStorage
@@ -117,21 +118,21 @@ Storage monitoring - Track usage
 📁 File Structure
 text
 DataViz-Pro/
-├── index.html              # Main application file (complete)
-├── README.md               # This documentation
+├── index.html                    # Main application file (complete)
+├── README.md                     # This documentation
 └── (No additional files needed - everything in one HTML)
 
 🎯 Example AI Queries
 What to Ask	AI Response
-"Show me statistics"	    Returns row count, column count, numeric columns
-"Average of Sales"	        Calculates mean of Sales column
+"Show me statistics"	         Returns row count, column count, numeric columns
+"Average of Sales"	         Calculates mean of Sales column
 "What charts should I use?"	Recommends based on your data
-"How many rows?"	        Returns total row count
-"List all columns"	        Shows all column names
-"Highest profit"	        Finds maximum profit value
-"Trend analysis"	        Analyzes increasing/decreasing patterns
-"Summarize my data"	        Quick overview of dataset
-"Help"	                    Lists all AI capabilities
+"How many rows?"	            Returns total row count
+"List all columns"	         Shows all column names
+"Highest profit"	            Finds maximum profit value
+"Trend analysis"	            Analyzes increasing/decreasing patterns
+"Summarize my data"	         Quick overview of dataset
+"Help"	                     Lists all AI capabilities
 
 💡 Sample Use Cases
 Business User
@@ -172,17 +173,17 @@ Handles datasets up to 100,000 rows
 GPU acceleration for charts
 
 📊 Supported File Formats
-Format	 Extension	Max  Size	 Max Rows
-Excel	 .xlsx,    .xls	 50MB	 100,000
-CSV	     .csv	   50MB	 100,000
+Format	 Extension	Max    Size	    Max Rows
+Excel	    .xlsx,     .xls	 50MB	    100,000
+CSV	    .csv	             50MB	    100,000
 
 Problem	                  Solution
 Charts not showing	      Make sure Excel has numeric columns
-File too large	          Split into multiple files (max 100k rows)
-AI not responding	      Check if data is loaded first
-PDF export fails	      Use browser print instead (Ctrl+P)
-ZIP download not working  Check browser permissions
-Dark mode not saving	  Clear browser cache and reload
+File too large	            Split into multiple files (max 100k rows)
+AI not responding	         Check if data is loaded first
+PDF export fails	         Use browser print instead (Ctrl+P)
+ZIP download not working   Check browser permissions
+Dark mode not saving	      Clear browser cache and reload
 
 🔒 Privacy Guarantee
 Your data NEVER leaves your computer:
@@ -250,14 +251,14 @@ start index.html
 xdg-open index.html
 🌟 Why DataViz Pro?
 Feature	            DataViz Pro	    Tableau	    Power BI
-Price	            FREE	        $75/month	$14-24/month
-Login Required	    ❌ No	        ✅ Yes	    ✅ Yes
-Data Leaves Device	❌ No	        ✅ Yes	    ✅ Yes
-AI Assistant	    ✅ Yes	        ❌ No	    Limited
-Open Source	        ✅ Yes	        ❌ No	    ❌ No
-Chart Types	        8+	            Many	    Many
-ZIP Export	        ✅ Yes	        ❌ No	    ❌ No
-QR Code Sharing	    ✅ Yes	        ❌ No	    ❌ No
+Price	               FREE	        $75/month	    $14-24/month
+Login Required	      ❌ No	        ✅ Yes	       ✅ Yes
+Data Leaves Device	❌ No	        ✅ Yes	       ✅ Yes
+AI Assistant	      ✅ Yes       ❌ No	       Limited
+Open Source	         ✅ Yes       ❌ No	       ❌ No
+Chart Types	         8+	           Many	       Many
+ZIP Export	         ✅ Yes       ❌ No	       ❌ No
+QR Code Sharing	   ✅ Yes	     ❌ No	       ❌ No
 
 *Data belongs to everyone, not just those who can afford $75/month.*
 Remember: No login, no cost, data stays yours, AI is always ready to help! 🚀
