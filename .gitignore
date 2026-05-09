@@ -1,0 +1,15 @@
+# IDE and System Files - DON'T push these!
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
