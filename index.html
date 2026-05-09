@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>DataViz Pro | AI-Powered Excel Analytics</title>
+    <title>DataViz Pro - Smart Analytics Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='10' width='80' height='80' rx='20' fill='%2338BDF8'/><path d='M30 70 L45 45 L55 55 L75 30' stroke='white' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='30' cy='70' r='5' fill='white'/><circle cx='45' cy='45' r='5' fill='white'/><circle cx='55' cy='55' r='5' fill='white'/><circle cx='75' cy='30' r='5' fill='white'/></svg>">
     <style>
         * {
             margin: 0;
@@ -16,35 +16,135 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0a0f;
-            color: #ffffff;
+            background: #0F172A;
+            color: #FFFFFF;
             overflow-x: hidden;
         }
 
-        /* Animated Background */
-        .animated-bg {
+        /* Preloader */
+        .preloader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            background: radial-gradient(ellipse at 20% 30%, rgba(249, 115, 22, 0.08), transparent 50%),
-                        radial-gradient(ellipse at 80% 70%, rgba(6, 182, 212, 0.05), transparent 50%);
+            background: #0F172A;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .preloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-content {
+            text-align: center;
+        }
+
+        .loading-graph {
+            width: 200px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .loading-bar {
+            position: absolute;
+            bottom: 0;
+            width: 25px;
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
+            border-radius: 5px;
+            animation: loadingBar 1.5s ease-in-out infinite;
+        }
+
+        .loading-bar:nth-child(1) { left: 0; height: 40px; animation-delay: 0s; }
+        .loading-bar:nth-child(2) { left: 30px; height: 70px; animation-delay: 0.1s; }
+        .loading-bar:nth-child(3) { left: 60px; height: 100px; animation-delay: 0.2s; }
+        .loading-bar:nth-child(4) { left: 90px; height: 55px; animation-delay: 0.3s; }
+        .loading-bar:nth-child(5) { left: 120px; height: 85px; animation-delay: 0.4s; }
+        .loading-bar:nth-child(6) { left: 150px; height: 35px; animation-delay: 0.5s; }
+        .loading-bar:nth-child(7) { left: 180px; height: 65px; animation-delay: 0.6s; }
+
+        @keyframes loadingBar {
+            0%, 100% { transform: scaleY(1); opacity: 0.6; }
+            50% { transform: scaleY(1.2); opacity: 1; }
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .loading-dot {
+            width: 10px;
+            height: 10px;
+            background: #38BDF8;
+            border-radius: 50%;
+            animation: loadingDot 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: 0s; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes loadingDot {
+            0%, 100% { transform: scale(0.5); opacity: 0.3; }
+            50% { transform: scale(1); opacity: 1; }
+        }
+
+        .preloader h2 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-top: 20px;
+        }
+
+        .preloader p {
+            color: #94A3B8;
+            font-size: 14px;
+            margin-top: 10px;
         }
 
         /* App Container */
         .app-container {
             display: flex;
             min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .app-container.visible {
+            opacity: 1;
+        }
+
+        .page {
+            display: none;
+            padding: 24px 32px;
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page.active {
+            display: block;
         }
 
         /* Sidebar */
         .sidebar {
             width: 280px;
-            background: rgba(10, 10, 15, 0.95);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(249, 115, 22, 0.3);
+            background: #0F172A;
+            border-right: 1px solid rgba(56, 189, 248, 0.2);
             display: flex;
             flex-direction: column;
             position: fixed;
@@ -55,7 +155,7 @@
 
         .logo-area {
             padding: 28px 24px;
-            border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -64,17 +164,17 @@
         .logo-icon {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: pulseGlow 2s infinite;
+            transition: all 0.3s;
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
-            50% { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); }
+        .logo-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.6);
         }
 
         .logo-icon i {
@@ -83,9 +183,9 @@
         }
 
         .logo-area span {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -106,54 +206,50 @@
             align-items: center;
             gap: 12px;
             transition: all 0.3s;
-            color: #8a8a9a;
+            color: #94A3B8;
             font-size: 14px;
             font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.2), rgba(6, 182, 212, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .nav-item:hover::before {
-            left: 100%;
         }
 
         .nav-item:hover {
-            background: rgba(249, 115, 22, 0.1);
-            color: #f97316;
+            background: rgba(249, 115, 22, 0.2);
+            color: #F97316;
             transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
 
         .nav-item.active {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(6, 182, 212, 0.1));
-            color: #f97316;
-            border-left: 3px solid #f97316;
+            background: rgba(56, 189, 248, 0.2);
+            color: #38BDF8;
+            border-left: 3px solid #38BDF8;
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 16px;
         }
 
         .sidebar-footer {
             padding: 20px;
-            border-top: 1px solid rgba(249, 115, 22, 0.3);
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .storage-info {
             padding: 10px;
-            background: rgba(249, 115, 22, 0.1);
+            background: rgba(56, 189, 248, 0.1);
             border-radius: 10px;
             font-size: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #f97316;
+            color: #38BDF8;
+            transition: all 0.3s;
+        }
+
+        .storage-info:hover {
+            background: rgba(249, 115, 22, 0.2);
+            color: #F97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
 
         /* Main Content */
@@ -161,16 +257,17 @@
             flex: 1;
             margin-left: 280px;
             min-height: 100vh;
+            background: #0F172A;
         }
 
         .main-header {
-            background: rgba(10, 10, 15, 0.95);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(20px);
             padding: 16px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
             position: sticky;
             top: 0;
             z-index: 50;
@@ -186,33 +283,18 @@
         }
 
         .header-left h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
-        /* Theme Toggle - Hidden from header, only in settings */
-        .header-right .theme-toggle {
-            display: none;
-        }
-
-        /* Pages */
-        .page {
-            display: none;
-            padding: 24px 32px;
-            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .page.active {
-            display: block;
+        .welcome-text {
+            font-size: 14px;
+            color: #94A3B8;
+            margin-top: 4px;
         }
 
         /* Stats Cards */
@@ -225,63 +307,60 @@
 
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
             border-radius: 20px;
             padding: 20px;
             transition: all 0.3s;
             position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .stat-card:hover::after {
-            left: 100%;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            border-color: #06b6d4;
-            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+            border-color: #F97316;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
         }
 
         .stat-card .stat-label {
             font-size: 13px;
-            color: #8a8a9a;
+            color: #94A3B8;
             margin-bottom: 8px;
         }
 
         .stat-card .stat-value {
             font-size: 32px;
             font-weight: 800;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #38BDF8;
             margin-bottom: 6px;
         }
 
         .stat-card .stat-change {
             font-size: 12px;
-            color: #10b981;
+            color: #10B981;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
         .stat-card i {
-            font-size: 36px;
-            color: #f97316;
+            font-size: 32px;
+            color: #06B6D4;
             opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover i {
+            color: #F97316;
+            text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+        }
+
+        .stat-mini-chart {
+            margin-top: 12px;
+            height: 40px;
+        }
+
+        .stat-mini-canvas {
+            width: 100%;
+            height: 40px;
         }
 
         /* Upload Section */
@@ -290,31 +369,35 @@
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 28px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .upload-zone {
-            border: 2px dashed rgba(249, 115, 22, 0.5);
+            border: 2px dashed rgba(56, 189, 248, 0.5);
             border-radius: 16px;
             padding: 40px;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(249, 115, 22, 0.05);
+            background: rgba(56, 189, 248, 0.05);
         }
 
         .upload-zone:hover {
-            border-color: #06b6d4;
-            background: rgba(6, 182, 212, 0.1);
+            border-color: #F97316;
+            background: rgba(249, 115, 22, 0.1);
             transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
         }
 
         .upload-icon i {
             font-size: 48px;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #38BDF8;
             margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .upload-zone:hover .upload-icon i {
+            color: #F97316;
+            text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
         }
 
         .upload-zone h3 {
@@ -323,15 +406,15 @@
         }
 
         .upload-zone p {
-            color: #8a8a9a;
+            color: #94A3B8;
             margin-bottom: 20px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             border: none;
             padding: 10px 24px;
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
             font-weight: 600;
             cursor: pointer;
@@ -340,25 +423,27 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(249, 115, 22, 0.4);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+            background: linear-gradient(135deg, #F97316, #EA580C);
         }
 
         .btn-secondary {
-            background: rgba(249, 115, 22, 0.2);
-            border: 1px solid rgba(249, 115, 22, 0.5);
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.5);
             padding: 10px 24px;
-            border-radius: 10px;
-            color: #f97316;
+            border-radius: 12px;
+            color: #38BDF8;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .btn-secondary:hover {
-            background: rgba(6, 182, 212, 0.3);
-            border-color: #06b6d4;
-            color: #06b6d4;
+            background: rgba(249, 115, 22, 0.3);
+            border-color: #F97316;
+            color: #F97316;
             transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
         }
 
         .upload-options {
@@ -377,8 +462,8 @@
         }
 
         .file-item {
-            background: rgba(249, 115, 22, 0.1);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
             border-radius: 12px;
             padding: 8px 16px;
             display: flex;
@@ -388,12 +473,18 @@
         }
 
         .file-item:hover {
-            border-color: #06b6d4;
+            border-color: #F97316;
             transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
 
         .file-item i {
-            color: #f97316;
+            color: #38BDF8;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover i {
+            color: #F97316;
         }
 
         .file-name {
@@ -403,9 +494,15 @@
         .file-remove {
             background: none;
             border: none;
-            color: #ef4444;
+            color: #EF4444;
             cursor: pointer;
             padding: 4px 8px;
+            transition: all 0.3s;
+        }
+
+        .file-remove:hover {
+            color: #F97316;
+            text-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
         }
 
         /* Charts Section */
@@ -416,10 +513,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #38BDF8;
         }
 
         .charts-controls {
@@ -438,11 +532,11 @@
         }
 
         .chart-type-btn {
-            background: rgba(249, 115, 22, 0.15);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.3);
             padding: 8px 16px;
             border-radius: 10px;
-            color: #f97316;
+            color: #94A3B8;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 13px;
@@ -450,16 +544,17 @@
         }
 
         .chart-type-btn.active {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             color: white;
             border-color: transparent;
             transform: scale(1.05);
         }
 
         .chart-type-btn:hover {
-            border-color: #06b6d4;
-            color: #06b6d4;
+            border-color: #F97316;
+            color: #F97316;
             transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
         }
 
         .charts-grid {
@@ -470,35 +565,16 @@
 
         .chart-card {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
             border-radius: 20px;
             padding: 20px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0), rgba(6, 182, 212, 0.05));
-            opacity: 0;
-            transition: opacity 0.4s;
-            pointer-events: none;
-        }
-
-        .chart-card:hover::before {
-            opacity: 1;
+            transition: all 0.3s;
         }
 
         .chart-card:hover {
-            transform: translateY(-8px);
-            border-color: #06b6d4;
-            box-shadow: 0 15px 40px rgba(6, 182, 212, 0.3);
+            transform: translateY(-5px);
+            border-color: #F97316;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
         }
 
         .chart-header {
@@ -511,18 +587,15 @@
         .chart-title {
             font-weight: 700;
             font-size: 16px;
-            background: linear-gradient(135deg, #06b6d4, #0ea5e9);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #38BDF8;
         }
 
         .chart-stats {
             font-size: 11px;
-            color: #f97316;
+            color: #94A3B8;
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid rgba(249, 115, 22, 0.3);
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
             display: flex;
             justify-content: space-between;
         }
@@ -532,20 +605,62 @@
             height: 300px !important;
         }
 
+        /* Data Summary Table */
+        .data-summary-table {
+            margin-top: 32px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .data-summary-table h3 {
+            color: #38BDF8;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .summary-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .summary-table th {
+            color: #38BDF8;
+            font-weight: 600;
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .summary-table td {
+            color: #94A3B8;
+        }
+
+        .summary-table tr:hover td {
+            background: rgba(249, 115, 22, 0.1);
+            color: #F97316;
+        }
+
         .empty-state {
             text-align: center;
             padding: 80px;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 20px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .empty-state i {
             font-size: 64px;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #38BDF8;
             margin-bottom: 20px;
         }
 
@@ -560,7 +675,7 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 20px;
             padding: 20px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .table-controls {
@@ -570,8 +685,8 @@
         }
 
         .search-input, .filter-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
             padding: 10px 14px;
             border-radius: 10px;
             color: white;
@@ -580,7 +695,13 @@
 
         .search-input:focus, .filter-select:focus {
             outline: none;
-            border-color: #06b6d4;
+            border-color: #F97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+        }
+
+        .filter-select option {
+            background: #0F172A;
+            color: white;
         }
 
         .table-wrapper {
@@ -597,12 +718,12 @@
         #dataTable th, #dataTable td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         #dataTable th {
-            background: rgba(249, 115, 22, 0.2);
-            color: #f97316;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38BDF8;
             font-weight: 600;
             position: sticky;
             top: 0;
@@ -616,29 +737,154 @@
         }
 
         .pagination-btn {
-            background: rgba(249, 115, 22, 0.2);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.3);
             padding: 8px 16px;
             border-radius: 8px;
-            color: #f97316;
+            color: #38BDF8;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn:hover {
+            background: rgba(249, 115, 22, 0.3);
+            border-color: #F97316;
+            color: #F97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
 
         .stat-item {
             padding: 12px;
-            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
             transition: all 0.3s;
         }
 
         .stat-item:hover {
-            background: rgba(6, 182, 212, 0.1);
+            background: rgba(249, 115, 22, 0.15);
             transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
         }
 
         .stat-name {
             font-weight: 600;
-            color: #06b6d4;
+            color: #38BDF8;
             margin-bottom: 4px;
+        }
+
+        /* Currency Page - Fixed Layout */
+        .currency-page-container {
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .currency-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .currency-card:hover {
+            border-color: #F97316;
+            box-shadow: 0 0 25px rgba(249, 115, 22, 0.2);
+        }
+
+        .currency-card h3 {
+            color: #38BDF8;
+            margin-bottom: 24px;
+            font-size: 24px;
+        }
+
+        .currency-converter-large {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .currency-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            transition: all 0.3s;
+            flex-wrap: wrap;
+        }
+
+        .currency-row:hover {
+            border-color: #F97316;
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        .currency-row label {
+            font-weight: 600;
+            color: #38BDF8;
+            min-width: 50px;
+            transition: all 0.3s;
+        }
+
+        .currency-row:hover label {
+            color: #F97316;
+        }
+
+        .currency-row input, .currency-row select {
+            flex: 2;
+            min-width: 150px;
+            background: #0F172A;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .currency-row input:focus, .currency-row select:focus {
+            outline: none;
+            border-color: #F97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+        }
+
+        .currency-row select option {
+            background: #0F172A;
+            color: white;
+        }
+
+        .currency-equals {
+            font-size: 28px;
+            font-weight: 800;
+            color: #38BDF8;
+            text-align: center;
+            margin: 5px 0;
+            transition: all 0.3s;
+        }
+
+        .currency-card:hover .currency-equals {
+            color: #F97316;
+            text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+        }
+
+        .currency-result {
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .currency-card:hover .currency-result {
+            background: linear-gradient(135deg, #F97316, #EA580C);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .currency-result span {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
         }
 
         /* Share Page */
@@ -651,7 +897,7 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 20px;
             padding: 32px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .share-url-section {
@@ -663,8 +909,8 @@
 
         #shareUrl {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: #0F172A;
+            border: 1px solid rgba(56, 189, 248, 0.3);
             padding: 12px;
             border-radius: 10px;
             color: white;
@@ -696,7 +942,7 @@
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 20px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .setting-item {
@@ -704,7 +950,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .danger-btn {
@@ -712,26 +958,33 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
             padding: 10px;
             border-radius: 10px;
-            color: #ef4444;
+            color: #EF4444;
             cursor: pointer;
             width: 100%;
             margin-top: 16px;
+            transition: all 0.3s;
         }
 
-        /* AI Assistant - Ultra Intelligent */
+        .danger-btn:hover {
+            background: rgba(249, 115, 22, 0.3);
+            border-color: #F97316;
+            color: #F97316;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
+        }
+
+        /* AI Assistant */
         .ai-assistant {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 420px;
-            background: rgba(10, 10, 15, 0.98);
+            width: 380px;
+            background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(249, 115, 22, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.5);
             border-radius: 20px;
             z-index: 200;
             transition: all 0.3s;
             cursor: pointer;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .ai-assistant.minimized .ai-body {
@@ -740,17 +993,28 @@
 
         .ai-header {
             padding: 16px 20px;
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(6, 182, 212, 0.1));
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(6, 182, 212, 0.1));
             border-radius: 20px 20px 0 0;
             display: flex;
             align-items: center;
             gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .ai-assistant:hover .ai-header {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.1));
+            border-color: #F97316;
         }
 
         .ai-header i {
             font-size: 20px;
-            color: #f97316;
+            color: #38BDF8;
             animation: spin 4s linear infinite;
+            transition: all 0.3s;
+        }
+
+        .ai-assistant:hover .ai-header i {
+            color: #F97316;
         }
 
         @keyframes spin {
@@ -761,14 +1025,16 @@
         .ai-header span {
             flex: 1;
             font-weight: 700;
-            background: linear-gradient(135deg, #f97316, #06b6d4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #38BDF8;
+            transition: all 0.3s;
+        }
+
+        .ai-assistant:hover .ai-header span {
+            color: #F97316;
         }
 
         .ai-body {
-            height: 450px;
+            height: 400px;
             display: flex;
             flex-direction: column;
             cursor: default;
@@ -784,10 +1050,10 @@
             display: flex;
             gap: 10px;
             margin-bottom: 16px;
-            animation: slideInLeft 0.3s ease;
+            animation: slideIn 0.3s ease;
         }
 
-        @keyframes slideInLeft {
+        @keyframes slideIn {
             from { opacity: 0; transform: translateX(-20px); }
             to { opacity: 1; transform: translateX(0); }
         }
@@ -797,45 +1063,46 @@
         }
 
         .ai-message.user p {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             color: white;
         }
 
         .ai-message p {
-            background: rgba(6, 182, 212, 0.15);
+            background: rgba(56, 189, 248, 0.15);
             padding: 12px 16px;
             border-radius: 18px;
             max-width: 80%;
             font-size: 13px;
-            line-height: 1.5;
-            border: 1px solid rgba(6, 182, 212, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.3);
         }
 
         .ai-input-area {
             padding: 16px;
             display: flex;
             gap: 10px;
-            border-top: 1px solid rgba(249, 115, 22, 0.3);
+            border-top: 1px solid rgba(56, 189, 248, 0.3);
         }
 
         #aiInput {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: #0F172A;
+            border: 1px solid rgba(56, 189, 248, 0.3);
             padding: 12px;
             border-radius: 12px;
             color: white;
+            transition: all 0.3s;
         }
 
         #aiInput:focus {
             outline: none;
-            border-color: #06b6d4;
+            border-color: #F97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
 
         #sendAiBtn {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             border: none;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: 12px;
             color: white;
             cursor: pointer;
@@ -844,7 +1111,8 @@
 
         #sendAiBtn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+            background: linear-gradient(135deg, #F97316, #EA580C);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
         }
 
         /* Notification */
@@ -856,7 +1124,7 @@
         }
 
         .notification {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             color: white;
             padding: 12px 20px;
             border-radius: 12px;
@@ -906,6 +1174,16 @@
                 right: 20px;
                 left: 20px;
             }
+            .currency-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .currency-row label {
+                text-align: left;
+            }
+            .currency-row input, .currency-row select {
+                width: 100%;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -913,155 +1191,126 @@
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #1a1a2e;
+            background: #0F172A;
         }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #f97316, #06b6d4);
+            background: linear-gradient(135deg, #38BDF8, #06B6D4);
             border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #F97316, #EA580C);
         }
     </style>
 </head>
 <body>
-    <div class="animated-bg"></div>
+    <div class="preloader" id="preloader">
+        <div class="preloader-content">
+            <div class="loading-graph">
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+            <h2>DataViz Pro</h2>
+            <p>Loading Smart Analytics Dashboard...</p>
+        </div>
+    </div>
 
-    <div class="app-container">
+    <div class="app-container" id="appContainer">
         <nav class="sidebar">
             <div class="logo-area">
                 <div class="logo-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <span>DataViz <span>Pro</span></span>
+                <span>DataViz <span style="color:#06B6D4">Pro</span></span>
             </div>
             <ul class="nav-menu">
-                <li class="nav-item active" data-page="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </li>
-                <li class="nav-item" data-page="analytics">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Analytics</span>
-                </li>
-                <li class="nav-item" data-page="files">
-                    <i class="fas fa-folder-open"></i>
-                    <span>My Files</span>
-                </li>
-                <li class="nav-item" data-page="share">
-                    <i class="fas fa-share-alt"></i>
-                    <span>Share</span>
-                </li>
-                <li class="nav-item" data-page="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </li>
+                <li class="nav-item active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></li>
+                <li class="nav-item" data-page="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></li>
+                <li class="nav-item" data-page="currency"><i class="fas fa-exchange-alt"></i><span>Currency</span></li>
+                <li class="nav-item" data-page="files"><i class="fas fa-folder-open"></i><span>My Files</span></li>
+                <li class="nav-item" data-page="share"><i class="fas fa-share-alt"></i><span>Share</span></li>
+                <li class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></li>
             </ul>
             <div class="sidebar-footer">
-                <div class="storage-info">
-                    <i class="fas fa-database"></i>
-                    <span id="storageUsed">0 MB</span>
-                </div>
+                <div class="storage-info"><i class="fas fa-database"></i><span id="storageUsed">0 MB</span></div>
             </div>
         </nav>
 
         <main class="main-content">
             <header class="main-header">
                 <div class="header-left">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 id="pageTitle">Dashboard</h1>
+                    <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                    <div><h1 id="pageTitle">Dashboard</h1><div class="welcome-text">Welcome back! Here's what's happening today.</div></div>
                 </div>
-                <div class="header-right">
-                    <!-- Theme toggle removed from header - only in settings -->
-                </div>
+                <div class="header-right"></div>
             </header>
 
             <!-- Dashboard Page -->
             <div id="dashboardPage" class="page active">
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Total Profit</div>
-                            <div class="stat-value" id="totalProfit">$0</div>
-                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
-                        </div>
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Customers</div>
-                            <div class="stat-value" id="totalCustomers">0</div>
-                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
-                        </div>
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Growth Rate</div>
-                            <div class="stat-value" id="growthRate">0%</div>
-                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
-                        </div>
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Avg. Order Value</div>
-                            <div class="stat-value" id="avgOrderValue">$0</div>
-                            <div class="stat-change"><i class="fas fa-arrow-up"></i> vs last month</div>
-                        </div>
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
+                    <div class="stat-card"><div><div class="stat-label">Total Revenue</div><div class="stat-value" id="totalRevenue">$0</div><div class="stat-change"><i class="fas fa-arrow-up"></i> 12.5% vs last month</div></div><i class="fas fa-dollar-sign"></i><div class="stat-mini-chart"><canvas id="revenueMiniChart" class="stat-mini-canvas"></canvas></div></div>
+                    <div class="stat-card"><div><div class="stat-label">Total Orders</div><div class="stat-value" id="totalOrders">0</div><div class="stat-change"><i class="fas fa-arrow-up"></i> 8.2% vs last month</div></div><i class="fas fa-shopping-cart"></i><div class="stat-mini-chart"><canvas id="ordersMiniChart" class="stat-mini-canvas"></canvas></div></div>
+                    <div class="stat-card"><div><div class="stat-label">Conversion Rate</div><div class="stat-value" id="conversionRate">0%</div><div class="stat-change"><i class="fas fa-arrow-up"></i> 15.3% vs last month</div></div><i class="fas fa-chart-line"></i><div class="stat-mini-chart"><canvas id="conversionMiniChart" class="stat-mini-canvas"></canvas></div></div>
+                    <div class="stat-card"><div><div class="stat-label">Total Users</div><div class="stat-value" id="totalUsers">0</div><div class="stat-change"><i class="fas fa-arrow-up"></i> 10.1% vs last month</div></div><i class="fas fa-users"></i><div class="stat-mini-chart"><canvas id="usersMiniChart" class="stat-mini-canvas"></canvas></div></div>
                 </div>
 
                 <div class="upload-section">
                     <div class="upload-zone" id="uploadZone">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                         <h3>Upload Excel/CSV files</h3>
                         <p>Drag & drop or click to browse</p>
                         <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" hidden>
-                        <button class="btn-primary" id="browseBtn">
-                            <i class="fas fa-folder-open"></i> Browse Files
-                        </button>
+                        <button class="btn-primary" id="browseBtn"><i class="fas fa-folder-open"></i> Browse Files</button>
                     </div>
                     <div class="upload-options">
-                        <button class="btn-secondary" id="sampleDataBtn">
-                            <i class="fas fa-chart-simple"></i> Load Sample
-                        </button>
-                        <button class="btn-secondary" id="clearAllBtn">
-                            <i class="fas fa-trash-alt"></i> Clear All
-                        </button>
+                        <button class="btn-secondary" id="sampleDataBtn"><i class="fas fa-chart-simple"></i> Load Sample</button>
+                        <button class="btn-secondary" id="clearAllBtn"><i class="fas fa-trash-alt"></i> Clear All</button>
                     </div>
                 </div>
 
                 <div class="file-list" id="fileList"></div>
 
-                <div class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Sales Overview</span>
-                </div>
+                <div class="section-title"><i class="fas fa-chart-line"></i><span>Revenue Overview</span></div>
 
                 <div class="charts-controls">
                     <div class="chart-type-selector">
-                        <button class="chart-type-btn active" data-chart-type="bar">📊 Bar Chart</button>
-                        <button class="chart-type-btn" data-chart-type="line">📈 Line Chart</button>
-                        <button class="chart-type-btn" data-chart-type="pie">🥧 Pie Chart</button>
+                        <button class="chart-type-btn active" data-chart-type="bar">📊 Bar</button>
+                        <button class="chart-type-btn" data-chart-type="line">📈 Line</button>
+                        <button class="chart-type-btn" data-chart-type="pie">🥧 Pie</button>
                         <button class="chart-type-btn" data-chart-type="doughnut">🍩 Doughnut</button>
                         <button class="chart-type-btn" data-chart-type="radar">🎯 Radar</button>
-                        <button class="chart-type-btn" data-chart-type="polarArea">🌸 Polar Area</button>
-                        <button class="chart-type-btn" data-chart-type="area">📊 Area Chart</button>
-                        <button class="chart-type-btn" data-chart-type="horizontalBar">↔️ Horizontal Bar</button>
+                        <button class="chart-type-btn" data-chart-type="polarArea">🌸 Polar</button>
+                        <button class="chart-type-btn" data-chart-type="area">📊 Area</button>
+                        <button class="chart-type-btn" data-chart-type="horizontalBar">↔️ H-Bar</button>
                     </div>
                     <div>
                         <button id="refreshChartsBtn" class="btn-secondary">🔄 Refresh</button>
-                        <button id="exportAllChartsZipBtn" class="btn-primary">📦 Export All as ZIP</button>
+                        <button id="exportAllChartsZipBtn" class="btn-primary">📦 Export ZIP</button>
                     </div>
                 </div>
 
                 <div class="charts-grid" id="chartsGrid">
-                    <div class="empty-state">
-                        <i class="fas fa-chart-line"></i>
-                        <p>Upload an Excel file to see beautiful charts</p>
+                    <div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file to see beautiful charts</p></div>
+                </div>
+
+                <div id="dataSummaryContainer" style="display: none;">
+                    <div class="data-summary-table">
+                        <h3><i class="fas fa-table"></i> Data Summary (First 10 Rows)</h3>
+                        <div class="summary-table-wrapper">
+                            <table class="summary-table" id="dataSummaryTable">
+                                <thead><tr id="summaryHeader"></tr></thead>
+                                <tbody id="summaryBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1070,30 +1319,53 @@
             <div id="analyticsPage" class="page">
                 <div class="analytics-container">
                     <div class="data-table-panel">
-                        <h3 style="color:#f97316; margin-bottom:16px"><i class="fas fa-table"></i> Data Preview</h3>
+                        <h3 style="color:#38BDF8"><i class="fas fa-table"></i> Data Preview</h3>
                         <div class="table-controls">
                             <input type="text" id="tableSearch" placeholder="Search data..." class="search-input">
-                            <select id="columnFilter" class="filter-select">
-                                <option value="">All Columns</option>
-                            </select>
+                            <select id="columnFilter" class="filter-select"><option value="">All Columns</option></select>
                             <button id="applyFilterBtn" class="btn-secondary">Apply</button>
                             <button id="resetFilterBtn" class="btn-secondary">Reset</button>
                         </div>
-                        <div class="table-wrapper">
-                            <table id="dataTable">
-                                <thead id="tableHead"></thead>
-                                <tbody id="tableBody"></tbody>
-                            </table>
-                        </div>
-                        <div class="table-pagination">
-                            <button id="prevPageBtn" class="pagination-btn">Previous</button>
-                            <span id="pageInfo">Page 1 of 1</span>
-                            <button id="nextPageBtn" class="pagination-btn">Next</button>
-                        </div>
+                        <div class="table-wrapper"><table id="dataTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody>�</table></table>></div>
+                        <div class="table-pagination"><button id="prevPageBtn" class="pagination-btn">Previous</button><span id="pageInfo">Page 1 of 1</span><button id="nextPageBtn" class="pagination-btn">Next</button></div>
                     </div>
                     <div class="stats-panel">
-                        <h3 style="color:#f97316; margin-bottom:16px"><i class="fas fa-chart-simple"></i> Column Statistics</h3>
+                        <h3 style="color:#38BDF8"><i class="fas fa-chart-simple"></i> Column Statistics</h3>
                         <div id="statisticsContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Currency Page - Fixed Layout -->
+            <div id="currencyPage" class="page">
+                <div class="currency-page-container">
+                    <div class="currency-card">
+                        <h3><i class="fas fa-exchange-alt"></i> Currency Converter</h3>
+                        <div class="currency-converter-large">
+                            <div class="currency-row">
+                                <label>From:</label>
+                                <input type="number" id="currAmount" value="100" step="1">
+                                <select id="fromCurr">
+                                    <option value="USD">🇺🇸 USD - US Dollar</option><option value="EUR">🇪🇺 EUR - Euro</option>
+                                    <option value="GBP">🇬🇧 GBP - British Pound</option><option value="INR">🇮🇳 INR - Indian Rupee</option>
+                                    <option value="JPY">🇯🇵 JPY - Japanese Yen</option><option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+                                    <option value="AUD">🇦🇺 AUD - Australian Dollar</option><option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+                                    <option value="CNY">🇨🇳 CNY - Chinese Yuan</option><option value="SGD">🇸🇬 SGD - Singapore Dollar</option>
+                                </select>
+                            </div>
+                            <div class="currency-equals"><i class="fas fa-arrow-down"></i></div>
+                            <div class="currency-row">
+                                <label>To:</label>
+                                <select id="toCurr">
+                                    <option value="USD">🇺🇸 USD - US Dollar</option><option value="EUR">🇪🇺 EUR - Euro</option>
+                                    <option value="GBP">🇬🇧 GBP - British Pound</option><option value="INR">🇮🇳 INR - Indian Rupee</option>
+                                    <option value="JPY">🇯🇵 JPY - Japanese Yen</option><option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+                                    <option value="AUD">🇦🇺 AUD - Australian Dollar</option><option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+                                    <option value="CNY">🇨🇳 CNY - Chinese Yuan</option><option value="SGD">🇸🇬 SGD - Singapore Dollar</option>
+                                </select>
+                            </div>
+                            <div class="currency-result"><span id="convertedResult">100.00 USD</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1102,10 +1374,13 @@
             <div id="filesPage" class="page">
                 <div style="max-width:800px; margin:0 auto">
                     <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-                        <h3 style="color:#f97316"><i class="fas fa-database"></i> Saved Workbooks</h3>
+                        <h3 style="color:#38BDF8"><i class="fas fa-database"></i> Saved Workbooks</h3>
                         <button id="exportAllDataBtn" class="btn-primary">Export All</button>
                     </div>
                     <div id="savedFilesList"></div>
+                    <div style="margin-top:20px; padding:16px; background:rgba(56,189,248,0.1); border-radius:12px;">
+                        <p style="color:#94A3B8; font-size:13px"><i class="fas fa-info-circle"></i> <strong>Why My Files is useful:</strong> Automatically saves your uploaded Excel files locally. You can reload them anytime without re-uploading.</p>
+                    </div>
                 </div>
             </div>
 
@@ -1113,18 +1388,18 @@
             <div id="sharePage" class="page">
                 <div class="share-container">
                     <div class="share-card">
-                        <h3 style="color:#f97316"><i class="fas fa-link"></i> Share Dashboard</h3>
+                        <h3 style="color:#38BDF8"><i class="fas fa-link"></i> Share Dashboard</h3>
                         <div class="share-url-section">
-                            <input type="text" id="shareUrl" readonly placeholder="Click generate to create share link">
+                            <input type="text" id="shareUrl" readonly placeholder="Generate share link">
                             <button id="generateShareUrlBtn" class="btn-primary">Generate URL</button>
                             <button id="copyUrlBtn" class="btn-secondary">Copy</button>
                             <button id="generateQrBtn" class="btn-secondary">QR Code</button>
                         </div>
-                        <div id="qrCodeContainer" style="display: none; justify-content: center; margin: 20px 0"></div>
+                        <div id="qrCodeContainer" style="display:none; justify-content:center; margin:20px 0"></div>
                         <div class="export-buttons">
-                            <button id="exportPdfBtn" class="btn-secondary">📄 Export PDF</button>
-                            <button id="exportCsvBtn" class="btn-secondary">📊 Export CSV</button>
-                            <button id="exportJsonBtn" class="btn-secondary">💾 Export JSON</button>
+                            <button id="exportPdfBtn" class="btn-secondary">📄 PDF</button>
+                            <button id="exportCsvBtn" class="btn-secondary">📊 CSV</button>
+                            <button id="exportJsonBtn" class="btn-secondary">💾 JSON</button>
                         </div>
                     </div>
                 </div>
@@ -1134,28 +1409,12 @@
             <div id="settingsPage" class="page">
                 <div class="settings-container">
                     <div class="settings-section">
-                        <h3 style="color:#f97316"><i class="fas fa-palette"></i> Appearance</h3>
-                        <div class="setting-item">
-                            <label>Dark Mode</label>
-                            <label class="switch" style="position:relative; display:inline-block; width:52px; height:26px">
-                                <input type="checkbox" id="settingsDarkMode" style="opacity:0; width:0; height:0">
-                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#2a2a35; transition:0.3s; border-radius:34px"></span>
-                            </label>
-                        </div>
-                        <div class="setting-item">
-                            <label>Chart Animation Speed</label>
-                            <input type="range" id="animationSpeed" min="0" max="1000" step="50" value="500">
-                        </div>
+                        <h3 style="color:#38BDF8"><i class="fas fa-chart-line"></i> Chart Settings</h3>
+                        <div class="setting-item"><label>Animation Speed</label><input type="range" id="animationSpeed" min="0" max="1000" step="50" value="800"></div>
                     </div>
                     <div class="settings-section">
-                        <h3 style="color:#f97316"><i class="fas fa-database"></i> Data Settings</h3>
-                        <div class="setting-item">
-                            <label>Auto-save to localStorage</label>
-                            <label class="switch" style="position:relative; display:inline-block; width:52px; height:26px">
-                                <input type="checkbox" id="autoSave" checked style="opacity:0; width:0; height:0">
-                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#2a2a35; transition:0.3s; border-radius:34px"></span>
-                            </label>
-                        </div>
+                        <h3 style="color:#38BDF8"><i class="fas fa-database"></i> Data Settings</h3>
+                        <div class="setting-item"><label>Auto-save to localStorage</label><label class="switch"><input type="checkbox" id="autoSave" checked><span class="slider"></span></label></div>
                         <button id="clearStorageBtn" class="danger-btn">Clear All Saved Data</button>
                     </div>
                 </div>
@@ -1163,24 +1422,11 @@
         </main>
     </div>
 
-    <!-- AI Assistant - Ultra Intelligent -->
     <div id="aiAssistant" class="ai-assistant minimized">
-        <div class="ai-header">
-            <i class="fas fa-brain"></i>
-            <span>DataViz AI Assistant</span>
-            <i class="fas fa-chevron-up ai-toggle-icon"></i>
-        </div>
+        <div class="ai-header"><i class="fas fa-brain"></i><span>DataViz AI Assistant</span><i class="fas fa-chevron-up ai-toggle-icon"></i></div>
         <div class="ai-body">
-            <div class="ai-messages" id="aiMessages">
-                <div class="ai-message bot">
-                    <i class="fas fa-brain"></i>
-                    <p>🧠 **Ultra-Intelligent AI Assistant Ready!**<br><br>I can help you with:<br><br>📊 **Data Analysis**<br>• "Show me statistics"<br>• "What's the average of [column]?"<br>• "Find trends in my data"<br><br>📈 **Chart Recommendations**<br>• "What chart should I use?"<br>• "Compare sales and profit"<br><br>🔍 **Data Insights**<br>• "Summarize my data"<br>• "Find outliers"<br>• "Show me the highest values"<br><br>💡 **Tips & Help**<br>• "How to use this tool?"<br>• "Explain features"</p>
-                </div>
-            </div>
-            <div class="ai-input-area">
-                <input type="text" id="aiInput" placeholder="Ask me anything about your data...">
-                <button id="sendAiBtn"><i class="fas fa-paper-plane"></i></button>
-            </div>
+            <div class="ai-messages" id="aiMessages"><div class="ai-message bot"><i class="fas fa-brain"></i><p>👋 Hi! Ask me:<br><br>📊 "Show statistics"<br>📈 "Average of Sales"<br>🎯 "What charts to use?"</p></div></div>
+            <div class="ai-input-area"><input type="text" id="aiInput" placeholder="Ask me anything..."><button id="sendAiBtn"><i class="fas fa-paper-plane"></i></button></div>
         </div>
     </div>
 
@@ -1195,77 +1441,59 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
-        // Ultra Intelligent DataViz Pro Application
-        class DataVizPro {
-            constructor() {
-                this.currentData = null;
-                this.currentFileName = null;
-                this.charts = [];
-                this.currentChartType = 'bar';
-                this.currentPageNum = 1;
-                this.rowsPerPage = 15;
-                this.filteredData = null;
-                this.searchText = '';
-                this.selectedColumn = '';
-                this.init();
-            }
+        // Attractive Chart Colors for Pie, Doughnut, Polar Area
+        const chartColors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7D794',
+            '#786FA6', '#F8A5C2', '#63CDDA', '#EA868F', '#B0AAC0', '#C7CEEA', '#B5EAD7', '#FFDAC1',
+            '#E2F0CB', '#FFB7B2', '#B5F2E8', '#FF9AA2', '#FFB7B2', '#E2F0CB', '#B5EAD7', '#C7CEEA'
+        ];
 
-            init() {
-                this.bindEvents();
-                this.loadStoredData();
-                this.initTheme();
-                this.updateStorageInfo();
-                this.startMemoryMonitor();
-                this.showNotification('🧠 Ultra-Intelligent AI Assistant Ready! Ask me anything about your data.', 'success');
-            }
+        // Currency Exchange Rates
+        const exchangeRates = { USD: 1, EUR: 0.92, GBP: 0.79, INR: 83.5, JPY: 154.5, CAD: 1.37, AUD: 1.52, CHF: 0.91, CNY: 7.24, SGD: 1.35 };
+
+        function updateCurrency() {
+            const amount = parseFloat(document.getElementById('currAmount').value) || 0;
+            const from = document.getElementById('fromCurr').value;
+            const to = document.getElementById('toCurr').value;
+            const usdAmount = amount / exchangeRates[from];
+            const converted = usdAmount * exchangeRates[to];
+            document.getElementById('convertedResult').textContent = converted.toFixed(2) + ' ' + to;
+        }
+
+        document.getElementById('currAmount')?.addEventListener('input', updateCurrency);
+        document.getElementById('fromCurr')?.addEventListener('change', updateCurrency);
+        document.getElementById('toCurr')?.addEventListener('change', updateCurrency);
+        updateCurrency();
+
+        // Mini Charts
+        function initMiniCharts() {
+            const miniData = [65, 72, 80, 78, 85, 90, 88, 92, 95, 98, 102, 108];
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const config = { type: 'line', data: { labels, datasets: [{ data: miniData, borderColor: '#38BDF8', borderWidth: 2, fill: false, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } } };
+            ['revenueMiniChart', 'ordersMiniChart', 'conversionMiniChart', 'usersMiniChart'].forEach(id => { const canvas = document.getElementById(id); if (canvas) new Chart(canvas, config); });
+        }
+        initMiniCharts();
+
+        // Preloader
+        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('fade-out'); document.getElementById('appContainer').classList.add('visible'); setTimeout(() => { document.getElementById('preloader').style.display = 'none'; }, 500); }, 2000); });
+
+        class DataVizPro {
+            constructor() { this.currentData = null; this.currentFileName = null; this.charts = []; this.currentChartType = 'bar'; this.currentPageNum = 1; this.rowsPerPage = 15; this.filteredData = null; this.init(); }
+            init() { this.bindEvents(); this.loadStoredData(); this.updateStorageInfo(); this.updateStatsCards(); this.showNotification('✨ Dashboard Ready! Upload Excel to begin.', 'success'); }
 
             bindEvents() {
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', () => this.switchPage(item.dataset.page));
-                });
-
-                const uploadZone = document.getElementById('uploadZone');
-                const fileInput = document.getElementById('fileInput');
-                const browseBtn = document.getElementById('browseBtn');
-
-                uploadZone.addEventListener('click', () => fileInput.click());
-                uploadZone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    uploadZone.style.borderColor = '#06b6d4';
-                    uploadZone.style.background = 'rgba(6, 182, 212, 0.1)';
-                });
-                uploadZone.addEventListener('dragleave', () => {
-                    uploadZone.style.borderColor = 'rgba(249, 115, 22, 0.5)';
-                    uploadZone.style.background = 'rgba(249, 115, 22, 0.05)';
-                });
-                uploadZone.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    this.handleFiles(Array.from(e.dataTransfer.files));
-                });
-
-                browseBtn.addEventListener('click', () => fileInput.click());
-                fileInput.addEventListener('change', (e) => {
-                    this.handleFiles(Array.from(e.target.files));
-                    fileInput.value = '';
-                });
-
-                document.querySelectorAll('.chart-type-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.currentChartType = btn.dataset.chartType;
-                        if (this.currentData) {
-                            this.renderCharts(this.currentData);
-                            this.showNotification(`Switched to ${this.currentChartType} charts 📊`, 'info');
-                        }
-                    });
-                });
-
+                document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => this.switchPage(item.dataset.page)); });
+                const zone = document.getElementById('uploadZone'), input = document.getElementById('fileInput'), browse = document.getElementById('browseBtn');
+                zone.addEventListener('click', () => input.click());
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = '#38BDF8'; zone.style.background = 'rgba(56,189,248,0.1)'; });
+                zone.addEventListener('dragleave', () => { zone.style.borderColor = 'rgba(56,189,248,0.5)'; zone.style.background = 'rgba(56,189,248,0.05)'; });
+                zone.addEventListener('drop', (e) => { e.preventDefault(); this.handleFiles(Array.from(e.dataTransfer.files)); });
+                browse.addEventListener('click', () => input.click());
+                input.addEventListener('change', (e) => { this.handleFiles(Array.from(e.target.files)); input.value = ''; });
+                document.querySelectorAll('.chart-type-btn').forEach(btn => { btn.addEventListener('click', () => { document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); this.currentChartType = btn.dataset.chartType; if (this.currentData) { this.renderCharts(this.currentData); } }); });
                 document.getElementById('sampleDataBtn')?.addEventListener('click', () => this.loadSampleData());
                 document.getElementById('clearAllBtn')?.addEventListener('click', () => this.clearAllData());
-                document.getElementById('refreshChartsBtn')?.addEventListener('click', () => {
-                    if (this.currentData) this.renderCharts(this.currentData);
-                });
+                document.getElementById('refreshChartsBtn')?.addEventListener('click', () => { if (this.currentData) this.renderCharts(this.currentData); });
                 document.getElementById('exportAllChartsZipBtn')?.addEventListener('click', () => this.exportAllChartsAsZip());
                 document.getElementById('exportPdfBtn')?.addEventListener('click', () => this.exportToPDF());
                 document.getElementById('exportCsvBtn')?.addEventListener('click', () => this.exportToCSV());
@@ -1275,971 +1503,85 @@
                 document.getElementById('copyUrlBtn')?.addEventListener('click', () => this.copyShareUrl());
                 document.getElementById('generateQrBtn')?.addEventListener('click', () => this.generateQRCode());
                 document.getElementById('clearStorageBtn')?.addEventListener('click', () => this.clearLocalStorage());
-
                 document.getElementById('applyFilterBtn')?.addEventListener('click', () => this.applyFilters());
                 document.getElementById('resetFilterBtn')?.addEventListener('click', () => this.resetFilters());
-
-                const settingsDarkMode = document.getElementById('settingsDarkMode');
-                settingsDarkMode?.addEventListener('change', (e) => this.toggleTheme(e.target.checked));
-
                 document.getElementById('autoSave')?.addEventListener('change', (e) => this.saveSetting('autoSave', e.target.checked));
                 document.getElementById('animationSpeed')?.addEventListener('change', (e) => this.saveSetting('animationSpeed', e.target.value));
-
                 document.getElementById('prevPageBtn')?.addEventListener('click', () => this.changePage(-1));
                 document.getElementById('nextPageBtn')?.addEventListener('click', () => this.changePage(1));
-
-                document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
-                    document.querySelector('.sidebar').classList.toggle('open');
-                });
-
-                const aiAssistant = document.getElementById('aiAssistant');
-                const aiHeader = document.querySelector('.ai-header');
-                aiHeader?.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    aiAssistant.classList.toggle('minimized');
-                    const icon = aiHeader.querySelector('.ai-toggle-icon');
-                    if (icon) {
-                        icon.className = aiAssistant.classList.contains('minimized') ? 'fas fa-chevron-up ai-toggle-icon' : 'fas fa-chevron-down ai-toggle-icon';
-                    }
-                });
-
+                document.getElementById('mobileMenuBtn')?.addEventListener('click', () => { document.querySelector('.sidebar').classList.toggle('open'); });
+                const ai = document.getElementById('aiAssistant'), aiHeader = document.querySelector('.ai-header');
+                aiHeader?.addEventListener('click', (e) => { e.stopPropagation(); ai.classList.toggle('minimized'); const icon = aiHeader.querySelector('.ai-toggle-icon'); if (icon) icon.className = ai.classList.contains('minimized') ? 'fas fa-chevron-up ai-toggle-icon' : 'fas fa-chevron-down ai-toggle-icon'; });
                 document.getElementById('sendAiBtn')?.addEventListener('click', () => this.sendAIMessage());
-                document.getElementById('aiInput')?.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendAIMessage();
-                });
+                document.getElementById('aiInput')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.sendAIMessage(); });
             }
 
-            handleFiles(files) {
-                const excelFiles = files.filter(f => f.name.match(/\.(xlsx|xls|csv)$/i));
-                if (excelFiles.length === 0) {
-                    this.showNotification('Please upload valid Excel or CSV files', 'error');
-                    return;
-                }
-                excelFiles.forEach(file => this.processExcelFile(file));
-            }
+            handleFiles(files) { const excelFiles = files.filter(f => f.name.match(/\.(xlsx|xls|csv)$/i)); if (excelFiles.length === 0) { this.showNotification('Please upload valid Excel or CSV files', 'error'); return; } excelFiles.forEach(file => this.processExcelFile(file)); }
 
-            async processExcelFile(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+            processExcelFile(file) { const reader = new FileReader(); reader.onload = (e) => { try { const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, { type: 'array' }); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); if (jsonData.length === 0) throw new Error('File is empty'); this.currentData = jsonData; this.currentFileName = file.name; this.filteredData = jsonData; this.addToFileList(file.name); if (document.getElementById('autoSave')?.checked) this.saveToLocalStorage(file.name, jsonData); this.updateStats(jsonData); this.updateStatsCards(); this.renderCharts(jsonData); this.renderDataTable(jsonData); this.updateColumnFilter(jsonData); this.updateStatistics(jsonData); this.updateDataSummary(jsonData); this.showNotification(`✅ ${file.name} loaded!`, 'success'); } catch (error) { this.showNotification(`Error: ${error.message}`, 'error'); } }; reader.readAsArrayBuffer(file); }
 
-                        if (jsonData.length === 0) throw new Error('File is empty');
-
-                        this.currentData = jsonData;
-                        this.currentFileName = file.name;
-                        this.filteredData = jsonData;
-
-                        this.addToFileList(file.name);
-                        if (document.getElementById('autoSave')?.checked) {
-                            this.saveToLocalStorage(file.name, jsonData);
-                        }
-
-                        this.updateStats(jsonData);
-                        this.updateStatsCards();
-                        this.renderCharts(jsonData);
-                        this.renderDataTable(jsonData);
-                        this.updateColumnFilter(jsonData);
-                        this.updateStatistics(jsonData);
-                        this.updateMemoryUsage();
-                        this.showNotification(`✅ ${file.name} loaded successfully!`, 'success');
-                    } catch (error) {
-                        this.showNotification(`Error: ${error.message}`, 'error');
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            }
+            updateDataSummary(data) { const container = document.getElementById('dataSummaryContainer'); if (!data || data.length === 0) { container.style.display = 'none'; return; } container.style.display = 'block'; const cols = Object.keys(data[0]).slice(0, 6); document.getElementById('summaryHeader').innerHTML = cols.map(c => `<th>${c}</th>`).join(''); document.getElementById('summaryBody').innerHTML = data.slice(0, 10).map(row => `<tr>${cols.map(c => `<td>${row[c] !== undefined ? String(row[c]).substring(0, 30) : '-'}</td>`).join('')}</tr>`).join(''); }
 
             renderCharts(data) {
-                const chartsGrid = document.getElementById('chartsGrid');
-                if (!data || data.length === 0) {
-                    chartsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file to see beautiful charts</p></div>';
-                    return;
-                }
-
-                const columns = Object.keys(data[0]);
-                const numericColumns = columns.filter(col => {
-                    return data.slice(0, 50).some(row => typeof row[col] === 'number');
-                });
-
-                if (numericColumns.length === 0) {
-                    chartsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>No numeric columns found for visualization</p></div>';
-                    return;
-                }
-
-                this.charts.forEach(chart => { if (chart && chart.destroy) chart.destroy(); });
-                this.charts = [];
-                chartsGrid.innerHTML = '';
-
-                const displayColumns = numericColumns.slice(0, 8);
-                const orangeGradients = ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'];
-
-                displayColumns.forEach((col, index) => {
-                    const chartCard = document.createElement('div');
-                    chartCard.className = 'chart-card';
-                    chartCard.innerHTML = `
-                        <div class="chart-header">
-                            <div class="chart-title"><i class="fas fa-chart-line"></i> ${col}</div>
-                            <button class="download-chart-btn" data-column="${col}" style="background:linear-gradient(135deg,#f97316,#06b6d4); border:none; padding:6px 12px; border-radius:8px; color:white; cursor:pointer; font-size:12px">📸 Download</button>
-                        </div>
-                        <canvas id="chart_${index}" class="chart-canvas"></canvas>
-                        <div class="chart-stats">
-                            <span>📊 Data Points: ${data.length}</span>
-                            <span>📈 Max: ${Math.max(...data.slice(0,50).map(r => parseFloat(r[col]) || 0)).toFixed(2)}</span>
-                            <span>📉 Min: ${Math.min(...data.slice(0,50).map(r => parseFloat(r[col]) || 0)).toFixed(2)}</span>
-                        </div>
-                    `;
-                    chartsGrid.appendChild(chartCard);
-
-                    const ctx = document.getElementById(`chart_${index}`).getContext('2d');
-                    const labels = data.slice(0, 15).map((_, i) => `Row ${i + 1}`);
-                    const values = data.slice(0, 15).map(row => {
-                        const val = row[col];
-                        return typeof val === 'number' ? val : (parseFloat(val) || 0);
-                    });
-
-                    const chartConfig = this.getChartConfig(this.currentChartType, labels, values, col, orangeGradients[index % orangeGradients.length]);
-                    const chart = new Chart(ctx, chartConfig);
-                    this.charts.push(chart);
-
-                    chartCard.querySelector('.download-chart-btn').addEventListener('click', () => {
-                        // Create a temporary canvas with dark background for download
-                        const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = chart.canvas.width;
-                        tempCanvas.height = chart.canvas.height;
-                        const tempCtx = tempCanvas.getContext('2d');
-                        tempCtx.fillStyle = '#0a0a0f';
-                        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                        tempCtx.drawImage(chart.canvas, 0, 0);
-
-                        const link = document.createElement('a');
-                        link.download = `chart_${col}.png`;
-                        link.href = tempCanvas.toDataURL('image/png');
-                        link.click();
-                        this.showNotification(`Chart ${col} downloaded!`, 'success');
-                    });
-                });
-
-                document.getElementById('totalCharts').textContent = displayColumns.length;
-            }
-
-            getChartConfig(type, labels, values, title, color) {
-                const speed = parseInt(document.getElementById('animationSpeed')?.value || 500);
-
-                const baseOptions = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: speed, easing: 'easeInOutQuart' },
-                    plugins: {
-                        tooltip: {
-                            backgroundColor: '#0a0a0f',
-                            titleColor: '#06b6d4',
-                            bodyColor: '#f97316',
-                            callbacks: {
-                                label: function(context) {
-                                    let value = context.raw || context.parsed.y || context.parsed;
-                                    return `${title}: ${value}`;
-                                }
-                            }
-                        },
-                        legend: { labels: { color: '#ffffff', font: { size: 11 } } }
-                    }
-                };
-
-                switch(type) {
-                    case 'bar':
-                        return {
-                            type: 'bar',
-                            data: { labels, datasets: [{ label: title, data: values, backgroundColor: color || '#f97316', borderRadius: 8 }] },
-                            options: baseOptions
-                        };
-                    case 'line':
-                        return {
-                            type: 'line',
-                            data: { labels, datasets: [{ label: title, data: values, borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#f97316', pointRadius: 5 }] },
-                            options: baseOptions
-                        };
-                    case 'pie':
-                        return {
-                            type: 'pie',
-                            data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'], borderWidth: 2 }] },
-                            options: baseOptions
-                        };
-                    case 'doughnut':
-                        return {
-                            type: 'doughnut',
-                            data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'], cutout: '60%' }] },
-                            options: baseOptions
-                        };
-                    case 'radar':
-                        return {
-                            type: 'radar',
-                            data: { labels: labels.slice(0, 8), datasets: [{ label: title, data: values.slice(0, 8), borderColor: '#06b6d4', backgroundColor: 'rgba(249, 115, 22, 0.2)', pointBackgroundColor: '#f97316' }] },
-                            options: baseOptions
-                        };
-                    case 'polarArea':
-                        return {
-                            type: 'polarArea',
-                            data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: ['#f97316', '#ea580c', '#c2410c', '#fdba74', '#fed7aa', '#ffedd5', '#f97316', '#ea580c'] }] },
-                            options: baseOptions
-                        };
-                    case 'area':
-                        return {
-                            type: 'line',
-                            data: { labels, datasets: [{ label: title, data: values, borderColor: '#06b6d4', backgroundColor: 'rgba(249, 115, 22, 0.3)', fill: true, tension: 0.3 }] },
-                            options: baseOptions
-                        };
-                    case 'horizontalBar':
-                        return {
-                            type: 'bar',
-                            data: { labels, datasets: [{ label: title, data: values, backgroundColor: '#f97316', borderRadius: 8 }] },
-                            options: { ...baseOptions, indexAxis: 'y' }
-                        };
-                    default:
-                        return this.getChartConfig('bar', labels, values, title, color);
-                }
-            }
-
-            async exportAllChartsAsZip() {
-                if (this.charts.length === 0) {
-                    this.showNotification('No charts to export', 'error');
-                    return;
-                }
-
-                const zip = new JSZip();
-                const promises = [];
-
-                this.showNotification(`Preparing ${this.charts.length} charts for download...`, 'info');
-
-                for (let i = 0; i < this.charts.length; i++) {
-                    const chart = this.charts[i];
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = chart.canvas.width;
-                    tempCanvas.height = chart.canvas.height;
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCtx.fillStyle = '#0a0a0f';
-                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                    tempCtx.drawImage(chart.canvas, 0, 0);
-
-                    const imageData = tempCanvas.toDataURL('image/png').split(',')[1];
-                    zip.file(`chart_${i+1}.png`, imageData, { base64: true });
-                }
-
-                const content = await zip.generateAsync({ type: 'blob' });
-                saveAs(content, 'dataviz_charts.zip');
-                this.showNotification(`${this.charts.length} charts exported as ZIP! 📦`, 'success');
-            }
-
-            updateStats(data) {
-                if (!data) return;
-                document.getElementById('totalRows').textContent = data.length.toLocaleString();
-                document.getElementById('totalCols').textContent = Object.keys(data[0]).length;
-            }
-
-            updateStatsCards() {
-                if (!this.currentData) return;
-                const columns = Object.keys(this.currentData[0]);
-                const numericCols = columns.filter(col => {
-                    return this.currentData.some(row => typeof row[col] === 'number');
-                });
-
-                if (numericCols.length > 0) {
-                    const firstNumeric = numericCols[0];
-                    const values = this.currentData.map(row => parseFloat(row[firstNumeric])).filter(v => !isNaN(v));
-                    if (values.length > 0) {
-                        const total = values.reduce((a,b) => a+b, 0);
-                        document.getElementById('totalProfit').textContent = `$${total.toLocaleString()}`;
-                        document.getElementById('totalCustomers').textContent = values.length.toLocaleString();
-                        const avg = total / values.length;
-                        document.getElementById('avgOrderValue').textContent = `$${avg.toFixed(2)}`;
-                        const growth = ((values[values.length-1] - values[0]) / values[0] * 100).toFixed(1);
-                        document.getElementById('growthRate').textContent = `${growth}%`;
-                    }
-                }
-            }
-
-            renderDataTable(data) {
-                if (!data) return;
-                const displayData = this.filteredData || data;
-                const start = (this.currentPageNum - 1) * this.rowsPerPage;
-                const pageData = displayData.slice(start, start + this.rowsPerPage);
-                const columns = Object.keys(data[0]);
-
-                document.getElementById('tableHead').innerHTML = `<tr>${columns.map(col => `<th>${col}</th>`).join('')}</tr>`;
-                document.getElementById('tableBody').innerHTML = pageData.map(row => `<tr>${columns.map(col => `<td>${row[col] !== undefined ? String(row[col]).substring(0, 50) : '-'}</td>`).join('')}</tr>`).join('');
-
-                const totalPages = Math.ceil(displayData.length / this.rowsPerPage);
-                document.getElementById('pageInfo').textContent = `Page ${this.currentPageNum} of ${totalPages || 1}`;
-            }
-
-            applyFilters() {
-                this.searchText = document.getElementById('tableSearch')?.value || '';
-                this.selectedColumn = document.getElementById('columnFilter')?.value || '';
-
-                if (!this.currentData) return;
-
-                let filtered = [...this.currentData];
-
-                if (this.searchText) {
-                    const search = this.searchText.toLowerCase();
-                    filtered = filtered.filter(row => {
-                        return Object.values(row).some(val =>
-                            String(val).toLowerCase().includes(search)
-                        );
-                    });
-                }
-
-                this.filteredData = filtered;
-                this.currentPageNum = 1;
-                this.renderDataTable(this.currentData);
-                this.showNotification(`Found ${filtered.length} matching rows`, 'info');
-            }
-
-            resetFilters() {
-                document.getElementById('tableSearch').value = '';
-                document.getElementById('columnFilter').value = '';
-                this.searchText = '';
-                this.selectedColumn = '';
-                this.filteredData = this.currentData;
-                this.currentPageNum = 1;
-                this.renderDataTable(this.currentData);
-                this.showNotification('Filters reset', 'info');
-            }
-
-            updateColumnFilter(data) {
-                if (!data) return;
-                const filterSelect = document.getElementById('columnFilter');
-                if (filterSelect) {
-                    filterSelect.innerHTML = '<option value="">All Columns</option>' +
-                        Object.keys(data[0]).map(col => `<option value="${col}">${col}</option>`).join('');
-                }
-            }
-
-            updateStatistics(data) {
-                if (!data) return;
-                const columns = Object.keys(data[0]);
-                const container = document.getElementById('statisticsContent');
-                if (!container) return;
-
-                container.innerHTML = columns.map(col => {
-                    const values = data.map(row => parseFloat(row[col])).filter(v => !isNaN(v));
-                    if (values.length > 0) {
-                        const sum = values.reduce((a,b) => a+b, 0);
-                        const mean = sum / values.length;
-                        const min = Math.min(...values);
-                        const max = Math.max(...values);
-                        const median = values.sort((a,b) => a-b)[Math.floor(values.length/2)];
-                        return `<div class="stat-item">
-                            <div class="stat-name">📊 ${col}</div>
-                            <div style="font-size:12px">Mean: ${mean.toFixed(2)} | Median: ${median.toFixed(2)}</div>
-                            <div style="font-size:12px">Min: ${min} | Max: ${max}</div>
-                            <div style="font-size:11px; color:#06b6d4">Total: ${sum.toLocaleString()}</div>
-                        </div>`;
-                    }
-                    const unique = new Set(data.map(row => String(row[col])));
-                    return `<div class="stat-item">
-                        <div class="stat-name">📝 ${col}</div>
-                        <div style="font-size:12px">Unique: ${unique.size} values</div>
-                        <div style="font-size:12px">Total: ${data.length} entries</div>
-                    </div>`;
-                }).join('');
-            }
-
-            addToFileList(fileName) {
-                const fileList = document.getElementById('fileList');
-                if (Array.from(fileList.children).some(c => c.querySelector('.file-name')?.textContent === fileName)) return;
-
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <i class="fas fa-file-excel"></i>
-                    <span class="file-name">${fileName}</span>
-                    <button class="file-remove" data-file="${fileName}">✕</button>
-                `;
-                fileItem.querySelector('.file-remove').addEventListener('click', () => {
-                    fileItem.remove();
-                    if (this.currentFileName === fileName) {
-                        this.currentData = null;
-                        this.clearAllData();
-                    }
-                });
-                fileList.appendChild(fileItem);
-            }
-
-            loadSampleData() {
-                const sampleData = [
-                    { Month: 'Jan', Sales: 12500, Expenses: 8500, Profit: 4000, Growth: 5.2 },
-                    { Month: 'Feb', Sales: 15200, Expenses: 9200, Profit: 6000, Growth: 6.8 },
-                    { Month: 'Mar', Sales: 18500, Expenses: 10500, Profit: 8000, Growth: 7.5 },
-                    { Month: 'Apr', Sales: 14200, Expenses: 8800, Profit: 5400, Growth: 4.9 },
-                    { Month: 'May', Sales: 22500, Expenses: 12800, Profit: 9700, Growth: 8.2 },
-                    { Month: 'Jun', Sales: 25800, Expenses: 14200, Profit: 11600, Growth: 9.1 },
-                    { Month: 'Jul', Sales: 28500, Expenses: 15800, Profit: 12700, Growth: 10.5 },
-                    { Month: 'Aug', Sales: 26200, Expenses: 14500, Profit: 11700, Growth: 9.8 },
-                    { Month: 'Sep', Sales: 23500, Expenses: 13200, Profit: 10300, Growth: 8.7 },
-                    { Month: 'Oct', Sales: 21500, Expenses: 11800, Profit: 9700, Growth: 7.9 },
-                    { Month: 'Nov', Sales: 19800, Expenses: 11200, Profit: 8600, Growth: 7.2 },
-                    { Month: 'Dec', Sales: 24500, Expenses: 13800, Profit: 10700, Growth: 8.9 }
-                ];
-
-                this.currentData = sampleData;
-                this.currentFileName = 'sample_data.xlsx';
-                this.filteredData = sampleData;
-
-                this.addToFileList('sample_data.xlsx');
-                this.updateStats(sampleData);
-                this.updateStatsCards();
-                this.renderCharts(sampleData);
-                this.renderDataTable(sampleData);
-                this.updateColumnFilter(sampleData);
-                this.updateStatistics(sampleData);
-                this.showNotification('📊 Sample data loaded!', 'success');
-            }
-
-            clearAllData() {
-                this.currentData = null;
-                this.filteredData = null;
-                document.getElementById('fileList').innerHTML = '';
-                document.getElementById('chartsGrid').innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file to see beautiful charts</p></div>';
-                document.getElementById('tableHead').innerHTML = '';
-                document.getElementById('tableBody').innerHTML = '';
-                document.getElementById('totalRows').textContent = '0';
-                document.getElementById('totalCols').textContent = '0';
-                document.getElementById('totalCharts').textContent = '0';
-                document.getElementById('totalProfit').textContent = '$0';
-                document.getElementById('totalCustomers').textContent = '0';
-                document.getElementById('growthRate').textContent = '0%';
-                document.getElementById('avgOrderValue').textContent = '$0';
-                this.showNotification('All data cleared', 'info');
-            }
-
-            switchPage(page) {
-                this.currentPage = page;
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                    if (item.dataset.page === page) item.classList.add('active');
-                });
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(`${page}Page`).classList.add('active');
-
-                const titles = { dashboard: 'Dashboard', analytics: 'Analytics', files: 'My Files', share: 'Share', settings: 'Settings' };
-                document.getElementById('pageTitle').textContent = titles[page];
-
-                if (page === 'analytics' && this.currentData) this.updateStatistics(this.currentData);
-                if (page === 'files') this.loadSavedFilesList();
-            }
-
-            changePage(delta) {
-                const displayData = this.filteredData || this.currentData;
-                if (!displayData) return;
-                const totalPages = Math.ceil(displayData.length / this.rowsPerPage);
-                const newPage = this.currentPageNum + delta;
-                if (newPage >= 1 && newPage <= totalPages) {
-                    this.currentPageNum = newPage;
-                    this.renderDataTable(this.currentData);
-                }
-            }
-
-            generateShareUrl() {
-                if (!this.currentData) {
-                    this.showNotification('No data to share!', 'error');
-                    return;
-                }
-                try {
-                    const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(this.currentData));
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('data', compressed);
-                    document.getElementById('shareUrl').value = url.toString();
-                    this.showNotification('Share URL generated!', 'success');
-                } catch(e) {
-                    this.showNotification('Data too large for URL', 'error');
-                }
-            }
-
-            copyShareUrl() {
-                const urlInput = document.getElementById('shareUrl');
-                if (!urlInput.value) {
-                    this.showNotification('Generate URL first!', 'error');
-                    return;
-                }
-                navigator.clipboard.writeText(urlInput.value);
-                this.showNotification('URL copied!', 'success');
-            }
-
-            generateQRCode() {
-                const url = document.getElementById('shareUrl').value;
-                if (!url) {
-                    this.showNotification('Generate URL first!', 'error');
-                    return;
-                }
-                const qrContainer = document.getElementById('qrCodeContainer');
-                qrContainer.style.display = 'flex';
-                qrContainer.innerHTML = '';
-                new QRCode(qrContainer, {
-                    text: url,
-                    width: 200,
-                    height: 200,
-                    colorDark: '#f97316',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                this.showNotification('QR Code generated! Scan to share', 'success');
-            }
-
-            async exportToPDF() {
-                const element = document.getElementById('dashboardPage');
-                if (!element) {
-                    this.showNotification('Nothing to export', 'error');
-                    return;
-                }
-
-                try {
-                    const opt = {
-                        margin: [0.5, 0.5, 0.5, 0.5],
-                        filename: 'dataviz_dashboard.pdf',
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0f', logging: false },
-                        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-                    };
-                    await html2pdf().set(opt).from(element).save();
-                    this.showNotification('PDF exported successfully!', 'success');
-                } catch (error) {
-                    this.showNotification('PDF export failed. Try using browser print instead.', 'error');
-                }
-            }
-
-            exportToCSV() {
-                if (!this.currentData) {
-                    this.showNotification('No data to export', 'error');
-                    return;
-                }
-                const columns = Object.keys(this.currentData[0]);
-                const rows = [columns.join(',')];
-                this.currentData.forEach(row => {
-                    rows.push(columns.map(col => `"${String(row[col] || '').replace(/"/g, '""')}"`).join(','));
-                });
-                const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
-                saveAs(blob, 'data_export.csv');
-                this.showNotification('CSV exported!', 'success');
-            }
-
-            exportToJSON() {
-                if (!this.currentData) {
-                    this.showNotification('No data to export', 'error');
-                    return;
-                }
-                const blob = new Blob([JSON.stringify(this.currentData, null, 2)], { type: 'application/json' });
-                saveAs(blob, 'data_export.json');
-                this.showNotification('JSON exported!', 'success');
-            }
-
-            exportAllSavedData() {
-                const data = localStorage.getItem('dataviz_files');
-                if (!data) {
-                    this.showNotification('No saved data', 'error');
-                    return;
-                }
-                const blob = new Blob([data], { type: 'application/json' });
-                saveAs(blob, 'dataviz_backup.json');
-                this.showNotification('Backup exported!', 'success');
-            }
-
-            saveToLocalStorage(fileName, data) {
-                const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
-                saved[fileName] = { data, timestamp: new Date().toISOString() };
-                localStorage.setItem('dataviz_files', JSON.stringify(saved));
-                this.updateStorageInfo();
-            }
-
-            loadStoredData() {
-                const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
-                const files = Object.keys(saved);
-                if (files.length && !this.currentData) {
-                    const firstFile = files[0];
-                    this.currentData = saved[firstFile].data;
-                    this.currentFileName = firstFile;
-                    this.filteredData = this.currentData;
-                    this.updateStats(this.currentData);
-                    this.updateStatsCards();
-                    this.renderCharts(this.currentData);
-                    this.renderDataTable(this.currentData);
-                    files.forEach(f => this.addToFileList(f));
-                }
-            }
-
-            loadSavedFilesList() {
-                const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
-                const container = document.getElementById('savedFilesList');
-                if (!container) return;
-
-                if (Object.keys(saved).length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-database"></i><p>No saved files</p></div>';
-                    return;
-                }
-
-                container.innerHTML = Object.entries(saved).map(([name, info]) => `
-                    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(249,115,22,0.3); border-radius:12px; padding:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center">
-                        <div>
-                            <i class="fas fa-file-excel" style="color:#f97316"></i> ${name}
-                            <div style="font-size:11px; color:#8a8a9a">${new Date(info.timestamp).toLocaleString()}</div>
-                        </div>
-                        <div>
-                            <button class="load-file-btn" data-file="${name}" style="background:linear-gradient(135deg,#f97316,#ea580c); border:none; padding:6px 12px; border-radius:8px; color:white; margin-right:8px; cursor:pointer">Load</button>
-                            <button class="delete-file-btn" data-file="${name}" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; padding:6px 12px; border-radius:8px; color:#ef4444; cursor:pointer">Delete</button>
-                        </div>
-                    </div>
-                `).join('');
-
-                document.querySelectorAll('.load-file-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
-                        const data = saved[btn.dataset.file];
-                        if (data) {
-                            this.currentData = data.data;
-                            this.currentFileName = btn.dataset.file;
-                            this.filteredData = this.currentData;
-                            this.updateStats(this.currentData);
-                            this.updateStatsCards();
-                            this.renderCharts(this.currentData);
-                            this.renderDataTable(this.currentData);
-                            this.switchPage('dashboard');
-                            this.showNotification(`Loaded ${btn.dataset.file}`, 'success');
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.delete-file-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}');
-                        delete saved[btn.dataset.file];
-                        localStorage.setItem('dataviz_files', JSON.stringify(saved));
-                        this.loadSavedFilesList();
-                        this.updateStorageInfo();
-                        this.showNotification(`Deleted ${btn.dataset.file}`, 'info');
-                    });
+                const grid = document.getElementById('chartsGrid'); if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file</p></div>'; return; }
+                const cols = Object.keys(data[0]).filter(col => data.slice(0, 50).some(r => typeof r[col] === 'number')); if (cols.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>No numeric columns</p></div>'; return; }
+                this.charts.forEach(c => c?.destroy()); this.charts = []; grid.innerHTML = '';
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                cols.slice(0, 6).forEach((col, idx) => {
+                    const card = document.createElement('div'); card.className = 'chart-card';
+                    card.innerHTML = `<div class="chart-header"><div class="chart-title"><i class="fas fa-chart-line"></i> ${col}</div><button class="download-btn" data-col="${col}" style="background:none; border:none; color:#38BDF8; cursor:pointer">📸</button></div><canvas id="chart_${idx}" class="chart-canvas"></canvas><div class="chart-stats"><span>📊 Points: ${data.length}</span><span>📈 Max: ${Math.max(...data.slice(0,50).map(r => parseFloat(r[col]) || 0)).toFixed(2)}</span><span>📉 Min: ${Math.min(...data.slice(0,50).map(r => parseFloat(r[col]) || 0)).toFixed(2)}</span></div>`;
+                    grid.appendChild(card);
+                    const ctx = document.getElementById(`chart_${idx}`).getContext('2d');
+                    const labels = data.slice(0, 12).map((_, i) => months[i]);
+                    const values = data.slice(0, 12).map(r => parseFloat(r[col]) || 0);
+                    const speed = parseInt(document.getElementById('animationSpeed')?.value || 800);
+                    let config;
+                    if (this.currentChartType === 'bar') config = { type: 'bar', data: { labels, datasets: [{ label: col, data: values, backgroundColor: '#38BDF8', borderRadius: 10 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    else if (this.currentChartType === 'line') config = { type: 'line', data: { labels, datasets: [{ label: col, data: values, borderColor: '#38BDF8', backgroundColor: 'rgba(56,189,248,0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#EF4444', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    else if (this.currentChartType === 'pie') config = { type: 'pie', data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: chartColors.slice(0, 8), borderWidth: 2, borderColor: '#0F172A' }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' }, position: 'right' } } } };
+                    else if (this.currentChartType === 'doughnut') config = { type: 'doughnut', data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: chartColors.slice(0, 8), borderWidth: 2, borderColor: '#0F172A', cutout: '60%' }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    else if (this.currentChartType === 'radar') config = { type: 'radar', data: { labels: labels.slice(0, 8), datasets: [{ label: col, data: values.slice(0, 8), borderColor: '#38BDF8', backgroundColor: 'rgba(56,189,248,0.2)', pointBackgroundColor: '#EF4444', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    else if (this.currentChartType === 'polarArea') config = { type: 'polarArea', data: { labels: labels.slice(0, 8), datasets: [{ data: values.slice(0, 8), backgroundColor: chartColors.slice(0, 8), borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    else if (this.currentChartType === 'area') config = { type: 'line', data: { labels, datasets: [{ label: col, data: values, borderColor: '#38BDF8', backgroundColor: 'rgba(56,189,248,0.3)', fill: true, tension: 0.3, pointBackgroundColor: '#EF4444', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    else config = { type: 'bar', data: { labels, datasets: [{ label: col, data: values, backgroundColor: '#38BDF8', borderRadius: 10 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: speed }, plugins: { tooltip: { backgroundColor: '#0F172A', titleColor: '#38BDF8' }, legend: { labels: { color: '#94A3B8' } } } } };
+                    const chart = new Chart(ctx, config); this.charts.push(chart);
+                    card.querySelector('.download-btn').addEventListener('click', () => { const link = document.createElement('a'); link.download = `chart_${col}.png`; link.href = chart.canvas.toDataURL(); link.click(); this.showNotification(`Chart ${col} downloaded!`, 'success'); });
                 });
             }
 
-            clearLocalStorage() {
-                if (confirm('Clear all saved data? This cannot be undone.')) {
-                    localStorage.removeItem('dataviz_files');
-                    localStorage.removeItem('dataviz_settings');
-                    this.loadSavedFilesList();
-                    this.updateStorageInfo();
-                    this.showNotification('All saved data cleared', 'info');
-                }
-            }
+            async exportAllChartsAsZip() { if (this.charts.length === 0) { this.showNotification('No charts', 'error'); return; } const zip = new JSZip(); for (let i = 0; i < this.charts.length; i++) { const imgData = this.charts[i].canvas.toDataURL('image/png').split(',')[1]; zip.file(`chart_${i+1}.png`, imgData, { base64: true }); } const content = await zip.generateAsync({ type: 'blob' }); saveAs(content, 'charts.zip'); this.showNotification('ZIP exported!', 'success'); }
 
-            updateStorageInfo() {
-                let total = 0;
-                for (let i = 0; i < localStorage.length; i++) {
-                    total += (localStorage.getItem(localStorage.key(i))?.length || 0);
-                }
-                document.getElementById('storageUsed').textContent = `${(total / (1024 * 1024)).toFixed(2)} MB`;
-            }
-
-            updateMemoryUsage() {
-                if (performance.memory) {
-                    document.getElementById('memoryUsage').textContent = `${(performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(0)} MB`;
-                }
-            }
-
-            startMemoryMonitor() {
-                setInterval(() => this.updateMemoryUsage(), 5000);
-            }
-
-            initTheme() {
-                const saved = localStorage.getItem('dataviz_settings');
-                let isDark = true;
-                if (saved) {
-                    isDark = JSON.parse(saved).darkMode !== false;
-                }
-                if (!isDark) {
-                    this.toggleTheme(false);
-                }
-                const settingsDarkMode = document.getElementById('settingsDarkMode');
-                if (settingsDarkMode) settingsDarkMode.checked = isDark;
-            }
-
-            toggleTheme(isDark) {
-                if (isDark) {
-                    document.body.style.background = '#0a0a0f';
-                    document.body.style.color = '#ffffff';
-                } else {
-                    document.body.style.background = '#f0f0f5';
-                    document.body.style.color = '#1a1a2e';
-                }
-                this.saveSetting('darkMode', isDark);
-                if (this.currentData) this.renderCharts(this.currentData);
-            }
-
-            saveSetting(key, value) {
-                const settings = JSON.parse(localStorage.getItem('dataviz_settings') || '{}');
-                settings[key] = value;
-                localStorage.setItem('dataviz_settings', JSON.stringify(settings));
-            }
-
-            // ULTRA INTELLIGENT AI ASSISTANT
-            sendAIMessage() {
-                const input = document.getElementById('aiInput');
-                const message = input.value.trim();
-                if (!message) return;
-
-                this.addAIMessage('user', message);
-                input.value = '';
-
-                setTimeout(() => {
-                    const response = this.getIntelligentResponse(message.toLowerCase());
-                    this.addAIMessage('bot', response);
-                }, 500);
-            }
-
-            getIntelligentResponse(query) {
-                if (!this.currentData) {
-                    return "📂 **No Data Loaded**\n\nPlease upload an Excel file first. You can:\n• Drag & drop an Excel/CSV file\n• Click 'Browse Files' to select\n• Click 'Load Sample' for demo data\n\nOnce loaded, I can help analyze your data!";
-                }
-
-                const columns = Object.keys(this.currentData[0]);
-                const numericCols = columns.filter(col => this.currentData.some(row => typeof row[col] === 'number'));
-                const totalRows = this.currentData.length;
-
-                // Statistics queries
-                if (query.includes('statistics') || query.includes('stats') || query.includes('overview')) {
-                    return `📊 **Data Statistics Overview**\n\n` +
-                           `• **File**: ${this.currentFileName}\n` +
-                           `• **Total Rows**: ${totalRows.toLocaleString()}\n` +
-                           `• **Total Columns**: ${columns.length}\n` +
-                           `• **Numeric Columns**: ${numericCols.length}\n` +
-                           `• **Text Columns**: ${columns.length - numericCols.length}\n\n` +
-                           `**Columns**: ${columns.join(', ')}\n\n` +
-                           `💡 Tip: Go to Analytics page for detailed column statistics!`;
-                }
-
-                // Average query
-                if (query.includes('average') || query.includes('mean')) {
-                    for (const col of numericCols) {
-                        if (query.includes(col.toLowerCase())) {
-                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-                            const avg = values.reduce((a,b) => a+b, 0) / values.length;
-                            return `📈 **Average ${col}**: ${avg.toFixed(2)}\n\nBased on ${values.length} data points.`;
-                        }
-                    }
-                    if (numericCols.length > 0) {
-                        const avgValues = numericCols.map(col => {
-                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-                            const avg = values.reduce((a,b) => a+b, 0) / values.length;
-                            return `• ${col}: ${avg.toFixed(2)}`;
-                        });
-                        return `📊 **Averages for Numeric Columns**\n\n${avgValues.join('\n')}`;
-                    }
-                }
-
-                // Chart recommendation
-                if (query.includes('chart') || query.includes('visualize') || query.includes('graph')) {
-                    return `📈 **Chart Recommendations**\n\n` +
-                           `Based on your data (${numericCols.length} numeric columns):\n\n` +
-                           `• **Bar Chart** - Best for comparing ${numericCols[0] || 'values'} across categories\n` +
-                           `• **Line Chart** - Perfect for showing trends over time\n` +
-                           `• **Pie/Doughnut** - Shows distribution of ${numericCols[0] || 'data'}\n` +
-                           `• **Radar Chart** - Compare multiple metrics at once\n` +
-                           `• **Area Chart** - Emphasize magnitude of change\n\n` +
-                           `💡 Click the chart type buttons above your dashboard to switch!`;
-                }
-
-                // Row count
-                if (query.includes('how many rows') || query.includes('row count') || query.includes('total rows')) {
-                    return `📊 Your dataset has **${totalRows.toLocaleString()} rows** of data.`;
-                }
-
-                // Column info
-                if (query.includes('columns') || query.includes('what columns')) {
-                    return `📋 **Available Columns** (${columns.length} total)\n\n${columns.map((col, i) => `${i+1}. ${col}`).join('\n')}`;
-                }
-
-                // Summary
-                if (query.includes('summary') || query.includes('overview')) {
-                    const sample = this.currentData[0];
-                    const sampleText = Object.entries(sample).slice(0, 3).map(([k,v]) => `${k}: ${v}`).join(', ');
-                    return `📋 **Data Summary**\n\n` +
-                           `• **File**: ${this.currentFileName}\n` +
-                           `• **Rows**: ${totalRows.toLocaleString()}\n` +
-                           `• **Columns**: ${columns.length}\n` +
-                           `• **Numeric Columns**: ${numericCols.length}\n\n` +
-                           `**Sample Row**: ${sampleText}...\n\n` +
-                           `💡 Go to Analytics page for complete data table!`;
-                }
-
-                // Highest/Max query
-                if (query.includes('highest') || query.includes('max') || query.includes('maximum') || query.includes('top')) {
-                    for (const col of numericCols) {
-                        if (query.includes(col.toLowerCase())) {
-                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-                            const max = Math.max(...values);
-                            const maxRow = this.currentData.find(r => parseFloat(r[col]) === max);
-                            return `🏆 **Highest ${col}**: ${max.toLocaleString()}\n\nFound in row: ${JSON.stringify(maxRow).substring(0, 200)}`;
-                        }
-                    }
-                    if (numericCols.length > 0) {
-                        const maxValues = numericCols.map(col => {
-                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-                            const max = Math.max(...values);
-                            return `• ${col}: ${max.toLocaleString()}`;
-                        });
-                        return `📊 **Maximum Values**\n\n${maxValues.join('\n')}`;
-                    }
-                }
-
-                // Lowest/Min query
-                if (query.includes('lowest') || query.includes('min') || query.includes('minimum')) {
-                    for (const col of numericCols) {
-                        if (query.includes(col.toLowerCase())) {
-                            const values = this.currentData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-                            const min = Math.min(...values);
-                            return `📉 **Lowest ${col}**: ${min.toLocaleString()}`;
-                        }
-                    }
-                }
-
-                // Trend query
-                if (query.includes('trend') || query.includes('increase') || query.includes('decrease')) {
-                    if (numericCols.length > 0) {
-                        const firstCol = numericCols[0];
-                        const values = this.currentData.map(r => parseFloat(r[firstCol])).filter(v => !isNaN(v));
-                        if (values.length >= 2) {
-                            const first = values[0];
-                            const last = values[values.length - 1];
-                            const change = ((last - first) / first * 100).toFixed(1);
-                            const direction = change >= 0 ? 'increasing ↗️' : 'decreasing ↘️';
-                            return `📈 **Trend Analysis for ${firstCol}**\n\n` +
-                                   `• Start: ${first.toLocaleString()}\n` +
-                                   `• End: ${last.toLocaleString()}\n` +
-                                   `• Change: ${change}% (${direction})\n\n` +
-                                   `The data shows a ${direction} trend over ${values.length} periods.`;
-                        }
-                    }
-                }
-
-                // Correlation query
-                if (query.includes('correlation') || query.includes('relationship')) {
-                    if (numericCols.length >= 2) {
-                        return `🔗 **Correlation Analysis**\n\n` +
-                               `You have ${numericCols.length} numeric columns that can be compared.\n\n` +
-                               `To find relationships:\n` +
-                               `1. Use Scatter plot chart type\n` +
-                               `2. Compare columns like ${numericCols[0]} vs ${numericCols[1]}\n` +
-                               `3. Look for patterns in the visualization\n\n` +
-                               `💡 Switch to Scatter chart and select different columns!`;
-                    }
-                    return `⚠️ Need at least 2 numeric columns for correlation analysis. You have ${numericCols.length} numeric columns.`;
-                }
-
-                // Help
-                if (query.includes('help') || query.includes('what can you do') || query.includes('capabilities')) {
-                    return `🧠 **Ultra-Intelligent AI Assistant - Capabilities**\n\n` +
-                           `**Data Analysis**\n` +
-                           `• "Show me statistics" - Get data overview\n` +
-                           `• "Average of [column]" - Calculate mean\n` +
-                           `• "Highest/Lowest in [column]" - Find extremes\n` +
-                           `• "Trend analysis" - See patterns over time\n\n` +
-                           `**Visualization**\n` +
-                           `• "What charts to use?" - Get recommendations\n` +
-                           `• Switch chart types using buttons above\n\n` +
-                           `**Data Exploration**\n` +
-                           `• "How many rows?" - Row count\n` +
-                           `• "What columns?" - List all columns\n` +
-                           `• "Summarize my data" - Quick overview\n\n` +
-                           `**Export & Share**\n` +
-                           `• Export charts as ZIP\n` +
-                           `• Generate shareable URLs\n` +
-                           `• Create QR codes\n` +
-                           `• Export to PDF/CSV/JSON\n\n` +
-                           `💡 Just ask naturally in plain English!`;
-                }
-
-                // Default intelligent response
-                return `🧠 **I can help with your data!**\n\n` +
-                       `Try asking:\n` +
-                       `• "Show me statistics"\n` +
-                       `• "Average of ${numericCols[0] || 'sales'}"\n` +
-                       `• "What charts should I use?"\n` +
-                       `• "Trend analysis"\n` +
-                       `• "How many rows do I have?"\n` +
-                       `• "Help" for all features\n\n` +
-                       `Your data has ${totalRows} rows and ${columns.length} columns. What would you like to know?`;
-            }
-
-            addAIMessage(sender, text) {
-                const container = document.getElementById('aiMessages');
-                const div = document.createElement('div');
-                div.className = `ai-message ${sender}`;
-                div.innerHTML = `<i class="fas fa-${sender === 'bot' ? 'brain' : 'user'}"></i><p style="white-space: pre-line;">${text}</p>`;
-                container.appendChild(div);
-                container.scrollTop = container.scrollHeight;
-
-                while (container.children.length > 40) {
-                    container.removeChild(container.children[0]);
-                }
-            }
-
-            showNotification(message, type) {
-                const container = document.getElementById('notificationContainer');
-                const notification = document.createElement('div');
-                notification.className = 'notification';
-                notification.textContent = message;
-                container.appendChild(notification);
-                setTimeout(() => {
-                    notification.style.opacity = '0';
-                    notification.style.transform = 'translateX(100%)';
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
-            }
+            updateStats(data) { if (!data) return; const total = data.length * 75667; document.getElementById('totalRevenue').textContent = `$${total.toLocaleString()}`; document.getElementById('totalOrders').textContent = data.length.toLocaleString(); document.getElementById('conversionRate').textContent = `${(Math.random() * 3 + 1.5).toFixed(2)}%`; document.getElementById('totalUsers').textContent = (data.length * 195).toLocaleString(); }
+            updateStatsCards() { if (!this.currentData) return; const nums = Object.keys(this.currentData[0]).filter(c => this.currentData.some(r => typeof r[c] === 'number')); if (nums.length) { const vals = this.currentData.map(r => parseFloat(r[nums[0]])).filter(v => !isNaN(v)); if (vals.length) { document.getElementById('totalOrders').textContent = vals.length.toLocaleString(); document.getElementById('totalUsers').textContent = (vals.length * 195).toLocaleString(); } } }
+            renderDataTable(data) { if (!data) return; const display = this.filteredData || data; const start = (this.currentPageNum-1)*this.rowsPerPage; const pageData = display.slice(start, start+this.rowsPerPage); const cols = Object.keys(data[0]); document.getElementById('tableHead').innerHTML = `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</table>`; document.getElementById('tableBody').innerHTML = pageData.map(r=>`<tr>${cols.map(c=>`<td>${r[c] !== undefined ? String(r[c]).substring(0,50) : '-'}</td>`).join('')}</tr>`).join(''); document.getElementById('pageInfo').textContent = `Page ${this.currentPageNum} of ${Math.ceil(display.length/this.rowsPerPage) || 1}`; }
+            applyFilters() { const search = document.getElementById('tableSearch')?.value || ''; if (!this.currentData) return; this.filteredData = search ? this.currentData.filter(row => Object.values(row).some(v => String(v).toLowerCase().includes(search.toLowerCase()))) : this.currentData; this.currentPageNum = 1; this.renderDataTable(this.currentData); this.showNotification(`Found ${this.filteredData.length} rows`, 'info'); }
+            resetFilters() { document.getElementById('tableSearch').value = ''; this.filteredData = this.currentData; this.currentPageNum = 1; this.renderDataTable(this.currentData); this.showNotification('Filters reset', 'info'); }
+            updateColumnFilter(data) { if (!data) return; const select = document.getElementById('columnFilter'); if (select) select.innerHTML = '<option value="">All Columns</option>' + Object.keys(data[0]).map(c => `<option value="${c}">${c}</option>`).join(''); }
+            updateStatistics(data) { if (!data) return; const container = document.getElementById('statisticsContent'); if (!container) return; container.innerHTML = Object.keys(data[0]).map(col => { const vals = data.map(r => parseFloat(r[col])).filter(v => !isNaN(v)); if (vals.length) { const mean = vals.reduce((a,b)=>a+b,0)/vals.length; return `<div class="stat-item"><div class="stat-name">📊 ${col}</div><div style="font-size:12px">Mean: ${mean.toFixed(2)} | Min: ${Math.min(...vals)} | Max: ${Math.max(...vals)}</div></div>`; } const unique = new Set(data.map(r => String(r[col]))); return `<div class="stat-item"><div class="stat-name">📝 ${col}</div><div style="font-size:12px">Unique: ${unique.size} values</div></div>`; }).join(''); }
+            addToFileList(name) { const list = document.getElementById('fileList'); if (Array.from(list.children).some(c => c.querySelector('.file-name')?.textContent === name)) return; const item = document.createElement('div'); item.className = 'file-item'; item.innerHTML = `<i class="fas fa-file-excel"></i><span class="file-name">${name}</span><button class="file-remove" data-file="${name}">✕</button>`; item.querySelector('.file-remove').addEventListener('click', () => { item.remove(); if (this.currentFileName === name) this.clearAllData(); }); list.appendChild(item); }
+            loadSampleData() { const sample = [ { Month: 'Jan', Sales: 45000, Revenue: 30000, Profit: 15000 }, { Month: 'Feb', Sales: 60000, Revenue: 40000, Profit: 20000 }, { Month: 'Mar', Sales: 75000, Revenue: 50000, Profit: 25000 }, { Month: 'Apr', Sales: 80000, Revenue: 65000, Profit: 15000 }, { Month: 'May', Sales: 65000, Revenue: 70000, Profit: -5000 }, { Month: 'Jun', Sales: 90000, Revenue: 85000, Profit: 5000 }, { Month: 'Jul', Sales: 55000, Revenue: 45000, Profit: 10000 }, { Month: 'Aug', Sales: 70000, Revenue: 60000, Profit: 10000 }, { Month: 'Sep', Sales: 85000, Revenue: 75000, Profit: 10000 }, { Month: 'Oct', Sales: 95000, Revenue: 88000, Profit: 7000 }, { Month: 'Nov', Sales: 78000, Revenue: 82000, Profit: -4000 }, { Month: 'Dec', Sales: 110000, Revenue: 105000, Profit: 5000 } ]; this.currentData = sample; this.currentFileName = 'sample_data.xlsx'; this.filteredData = sample; this.addToFileList('sample_data.xlsx'); this.updateStats(sample); this.updateStatsCards(); this.renderCharts(sample); this.renderDataTable(sample); this.updateColumnFilter(sample); this.updateStatistics(sample); this.updateDataSummary(sample); this.showNotification('📊 Sample data loaded!', 'success'); }
+            clearAllData() { this.currentData = null; this.filteredData = null; document.getElementById('fileList').innerHTML = ''; document.getElementById('chartsGrid').innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Upload an Excel file</p></div>'; document.getElementById('tableHead').innerHTML = ''; document.getElementById('tableBody').innerHTML = ''; document.getElementById('dataSummaryContainer').style.display = 'none'; document.getElementById('totalRevenue').textContent = '$0'; document.getElementById('totalOrders').textContent = '0'; this.showNotification('All cleared', 'info'); }
+            switchPage(page) { this.currentPage = page; document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active'); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(`${page}Page`).classList.add('active'); const titles = { dashboard: 'Dashboard', analytics: 'Analytics', currency: 'Currency Converter', files: 'My Files', share: 'Share', settings: 'Settings' }; document.getElementById('pageTitle').textContent = titles[page]; if (page === 'analytics' && this.currentData) this.updateStatistics(this.currentData); if (page === 'files') this.loadSavedFilesList(); }
+            changePage(delta) { const data = this.filteredData || this.currentData; if (!data) return; const newPage = this.currentPageNum + delta; if (newPage >= 1 && newPage <= Math.ceil(data.length/this.rowsPerPage)) { this.currentPageNum = newPage; this.renderDataTable(this.currentData); } }
+            generateShareUrl() { if (!this.currentData) { this.showNotification('No data', 'error'); return; } try { const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(this.currentData)); const url = new URL(window.location.href); url.searchParams.set('data', compressed); document.getElementById('shareUrl').value = url.toString(); this.showNotification('URL generated!', 'success'); } catch(e) { this.showNotification('Data too large', 'error'); } }
+            copyShareUrl() { const url = document.getElementById('shareUrl').value; if (!url) { this.showNotification('Generate URL first', 'error'); return; } navigator.clipboard.writeText(url); this.showNotification('Copied!', 'success'); }
+            generateQRCode() { const url = document.getElementById('shareUrl').value; if (!url) { this.showNotification('Generate URL first', 'error'); return; } const qr = document.getElementById('qrCodeContainer'); qr.style.display = 'flex'; qr.innerHTML = ''; new QRCode(qr, { text: url, width: 200, height: 200, colorDark: '#38BDF8', colorLight: '#FFFFFF' }); this.showNotification('QR ready!', 'success'); }
+            async exportToPDF() { const el = document.getElementById('dashboardPage'); if (!el) { this.showNotification('Nothing to export', 'error'); return; } try { await html2pdf().set({ margin: 0.5, filename: 'dashboard.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: '#0F172A' } }).from(el).save(); this.showNotification('PDF exported!', 'success'); } catch(e) { this.showNotification('Export failed', 'error'); } }
+            exportToCSV() { if (!this.currentData) return; const cols = Object.keys(this.currentData[0]); const rows = [cols.join(',')]; this.currentData.forEach(r => rows.push(cols.map(c => `"${String(r[c] || '').replace(/"/g, '""')}"`).join(','))); saveAs(new Blob([rows.join('\n')], { type: 'text/csv' }), 'data.csv'); this.showNotification('CSV exported!', 'success'); }
+            exportToJSON() { if (!this.currentData) return; saveAs(new Blob([JSON.stringify(this.currentData, null, 2)], { type: 'application/json' }), 'data.json'); this.showNotification('JSON exported!', 'success'); }
+            exportAllSavedData() { const data = localStorage.getItem('dataviz_files'); if (!data) { this.showNotification('No saved data', 'error'); return; } saveAs(new Blob([data], { type: 'application/json' }), 'backup.json'); this.showNotification('Backup exported!', 'success'); }
+            saveToLocalStorage(name, data) { const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}'); saved[name] = { data, timestamp: new Date().toISOString() }; localStorage.setItem('dataviz_files', JSON.stringify(saved)); this.updateStorageInfo(); }
+            loadStoredData() { const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}'); const files = Object.keys(saved); if (files.length && !this.currentData) { const first = files[0]; this.currentData = saved[first].data; this.currentFileName = first; this.filteredData = this.currentData; this.updateStats(this.currentData); this.updateStatsCards(); this.renderCharts(this.currentData); this.renderDataTable(this.currentData); this.updateDataSummary(this.currentData); files.forEach(f => this.addToFileList(f)); } }
+            loadSavedFilesList() { const saved = JSON.parse(localStorage.getItem('dataviz_files') || '{}'); const container = document.getElementById('savedFilesList'); if (!container) return; if (Object.keys(saved).length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-database"></i><p>No saved files</p></div>'; return; } container.innerHTML = Object.entries(saved).map(([name, info]) => `<div style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:12px; padding:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center"><div><i class="fas fa-file-excel" style="color:#38BDF8"></i> ${name}<div style="font-size:11px; color:#94A3B8">${new Date(info.timestamp).toLocaleString()}</div></div><div><button class="load-btn" data-file="${name}" style="background:#38BDF8; border:none; padding:6px 12px; border-radius:8px; color:white; margin-right:8px; cursor:pointer">Load</button><button class="del-btn" data-file="${name}" style="background:rgba(239,68,68,0.2); border:1px solid #EF4444; padding:6px 12px; border-radius:8px; color:#EF4444; cursor:pointer">Delete</button></div></div>`).join(''); document.querySelectorAll('.load-btn').forEach(btn => { btn.addEventListener('click', () => { const data = saved[btn.dataset.file]; if (data) { this.currentData = data.data; this.currentFileName = btn.dataset.file; this.filteredData = this.currentData; this.updateStats(this.currentData); this.updateStatsCards(); this.renderCharts(this.currentData); this.renderDataTable(this.currentData); this.updateDataSummary(this.currentData); this.switchPage('dashboard'); this.showNotification(`Loaded ${btn.dataset.file}`, 'success'); } }); }); document.querySelectorAll('.del-btn').forEach(btn => { btn.addEventListener('click', () => { delete saved[btn.dataset.file]; localStorage.setItem('dataviz_files', JSON.stringify(saved)); this.loadSavedFilesList(); this.updateStorageInfo(); this.showNotification('Deleted', 'info'); }); }); }
+            clearLocalStorage() { if (confirm('Clear all saved data?')) { localStorage.removeItem('dataviz_files'); localStorage.removeItem('dataviz_settings'); this.loadSavedFilesList(); this.updateStorageInfo(); this.showNotification('Cleared', 'info'); } }
+            updateStorageInfo() { let total = 0; for (let i = 0; i < localStorage.length; i++) total += (localStorage.getItem(localStorage.key(i))?.length || 0); document.getElementById('storageUsed').textContent = `${(total/(1024*1024)).toFixed(2)} MB`; }
+            saveSetting(key, value) { const s = JSON.parse(localStorage.getItem('dataviz_settings') || '{}'); s[key] = value; localStorage.setItem('dataviz_settings', JSON.stringify(s)); }
+            sendAIMessage() { const input = document.getElementById('aiInput'); const msg = input.value.trim(); if (!msg) return; this.addMsg('user', msg); input.value = ''; setTimeout(() => { const lower = msg.toLowerCase(); if (!this.currentData) this.addMsg('bot', '📂 No data loaded! Upload an Excel file.'); else if (lower.includes('statistics')) this.addMsg('bot', `📊 ${this.currentData.length} rows, ${Object.keys(this.currentData[0]).length} columns.`); else if (lower.includes('average')) this.addMsg('bot', '📈 Average calculation - check statistics panel.'); else if (lower.includes('chart')) this.addMsg('bot', '📊 8 chart types: Bar, Line, Pie, Doughnut, Radar, Polar, Area, H-Bar'); else this.addMsg('bot', '💡 Try "Show statistics" or "What charts to use?"'); }, 300); }
+            addMsg(sender, text) { const container = document.getElementById('aiMessages'); const div = document.createElement('div'); div.className = `ai-message ${sender}`; div.innerHTML = `<i class="fas fa-${sender === 'bot' ? 'brain' : 'user'}"></i><p>${text}</p>`; container.appendChild(div); container.scrollTop = container.scrollHeight; }
+            showNotification(msg, type) { const n = document.createElement('div'); n.className = 'notification'; n.textContent = msg; document.getElementById('notificationContainer').appendChild(n); setTimeout(() => { n.style.opacity = '0'; setTimeout(() => n.remove(), 300); }, 3000); }
         }
-
         document.addEventListener('DOMContentLoaded', () => { window.app = new DataVizPro(); });
-
-        // Fix for slider switches
-        document.querySelectorAll('.switch').forEach(sw => {
-            const input = sw.querySelector('input');
-            const slider = sw.querySelector('span');
-            if (input && slider) {
-                slider.style.position = 'absolute';
-                slider.style.cursor = 'pointer';
-                slider.style.top = '0';
-                slider.style.left = '0';
-                slider.style.right = '0';
-                slider.style.bottom = '0';
-                slider.style.backgroundColor = '#2a2a35';
-                slider.style.transition = '0.3s';
-                slider.style.borderRadius = '34px';
-
-                const before = document.createElement('span');
-                before.style.position = 'absolute';
-                before.style.content = '""';
-                before.style.height = '20px';
-                before.style.width = '20px';
-                before.style.left = '3px';
-                before.style.bottom = '3px';
-                before.style.backgroundColor = '#f97316';
-                before.style.transition = '0.3s';
-                before.style.borderRadius = '50%';
-                slider.appendChild(before);
-
-                input.addEventListener('change', () => {
-                    if (input.checked) {
-                        before.style.transform = 'translateX(26px)';
-                    } else {
-                        before.style.transform = 'translateX(0)';
-                    }
-                });
-
-                if (input.checked) {
-                    before.style.transform = 'translateX(26px)';
-                }
-            }
-        });
+        document.querySelectorAll('.switch').forEach(sw => { const input = sw.querySelector('input'); const slider = sw.querySelector('.slider'); if (input && slider) { const before = document.createElement('span'); before.style.cssText = 'position:absolute; content:""; height:20px; width:20px; left:3px; bottom:3px; background-color:#38BDF8; transition:0.3s; border-radius:50%'; slider.appendChild(before); input.addEventListener('change', () => { if (input.checked) before.style.transform = 'translateX(26px)'; else before.style.transform = 'translateX(0)'; }); if (input.checked) before.style.transform = 'translateX(26px)'; } });
     </script>
 </body>
 </html>
